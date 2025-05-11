@@ -21,22 +21,6 @@ interface SavedMessage {
   content: string;
 }
 
-interface AgentProps {
-  userName: string;
-  userId?: string;
-  interviewId?: string;
-  feedbackId?: string;
-  type: "generate" | "interview";
-  questions?: string[];
-}
-
-interface Message {
-  type: string;
-  transcriptType?: string;
-  role: "user" | "system" | "assistant";
-  transcript: string;
-}
-
 const Agent = ({
   userName,
   userId,
@@ -135,8 +119,6 @@ const Agent = ({
 
     if (type === "generate") {
       await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
-        clientMessages: [],
-        serverMessages: [],
         variableValues: {
           username: userName,
           userid: userId,
@@ -151,8 +133,6 @@ const Agent = ({
       }
 
       await vapi.start(interviewer, {
-        clientMessages: [],
-        serverMessages: [],
         variableValues: {
           questions: formattedQuestions,
         },
