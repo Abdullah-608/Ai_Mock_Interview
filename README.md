@@ -1,6 +1,6 @@
 # Prepwise: AI-Powered Interview Preparation Platform
 
-![Prepwise Banner](https://ai-mock-interview-mtci.vercel.app/opengraph-image.png)
+![Banner](image.png)
 
 Prepwise is a comprehensive job interview preparation platform powered by Vapi AI Voice agents, designed to help job seekers practice and improve their interview skills with realistic AI-driven interviews.
 
