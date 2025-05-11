@@ -11,29 +11,15 @@ import {
 } from "@/lib/actions/general.action";
 
 async function Home() {
-  // Get the current user (could be null if not authenticated)
   const user = await getCurrentUser();
-  
-  // Don't use non-null assertions (!) when user might be null
-  const userId = user?.id || "";
-  
-  // Add error handling around the Promise.all
-  let userInterviews = [];
-  let allInterview = [];
-  
-  try {
-    [userInterviews, allInterview] = await Promise.all([
-      getInterviewsByUserId(userId),
-      getLatestInterviews({ userId }),
-    ]);
-  } catch (error) {
-    console.error("Error fetching interviews:", error);
-    // Handle error gracefully, perhaps set empty arrays (already done above)
-  }
 
-  // Use safe optional chaining without non-null assertions
-  const hasPastInterviews = (userInterviews?.length || 0) > 0;
-  const hasUpcomingInterviews = (allInterview?.length || 0) > 0;
+  const [userInterviews, allInterview] = await Promise.all([
+    getInterviewsByUserId(user?.id!),
+    getLatestInterviews({ userId: user?.id! }),
+  ]);
+
+  const hasPastInterviews = userInterviews?.length! > 0;
+  const hasUpcomingInterviews = allInterview?.length! > 0;
 
   return (
     <>
@@ -63,10 +49,10 @@ async function Home() {
 
         <div className="interviews-section">
           {hasPastInterviews ? (
-            userInterviews.map((interview) => (
+            userInterviews?.map((interview) => (
               <InterviewCard
                 key={interview.id}
-                userId={userId}
+                userId={user?.id}
                 interviewId={interview.id}
                 role={interview.role}
                 type={interview.type}
@@ -85,10 +71,10 @@ async function Home() {
 
         <div className="interviews-section">
           {hasUpcomingInterviews ? (
-            allInterview.map((interview) => (
+            allInterview?.map((interview) => (
               <InterviewCard
                 key={interview.id}
-                userId={userId}
+                userId={user?.id}
                 interviewId={interview.id}
                 role={interview.role}
                 type={interview.type}
