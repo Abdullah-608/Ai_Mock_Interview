@@ -135,12 +135,4 @@ For more information about the technologies used:
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
 - [Google Gemini Documentation](https://ai.google.dev/docs)
 
-## 🚨 Tutorial
-
-This repository contains the code corresponding to an in-depth tutorial available on our YouTube channel, [JavaScript Mastery](https://youtube.com/javascriptmastery).
-
-If you prefer visual learning, this is the perfect resource for you. Follow our tutorial to learn how to build projects like these step-by-step in a beginner-friendly manner!
-
----
-
-Built with ❤️ by [JavaScript Mastery](https://www.jsmastery.pro)
+Built with ❤️ by Abdullah Mansoor
