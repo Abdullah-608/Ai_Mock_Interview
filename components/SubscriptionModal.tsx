@@ -62,7 +62,7 @@ const SubscriptionModal = ({ userId }: SubscriptionModalProps) => {
     <>
       <Button 
         onClick={() => setIsOpen(true)}
-        className="bg-gradient-to-r from-indigo-900 to-purple-800 text-white border border-indigo-700 hover:bg-gradient-to-r hover:from-indigo-800 hover:to-purple-700 max-sm:w-full transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 animation-delay-400 shadow-md shadow-indigo-900/20"
+        className=" block bg-gradient-to-r from-indigo-900 to-purple-800 text-white border border-indigo-700 hover:bg-gradient-to-r hover:from-indigo-800 hover:to-purple-700  transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 animation-delay-400 shadow-md shadow-indigo-900/20"
       >
         Upgrade Models
       </Button>

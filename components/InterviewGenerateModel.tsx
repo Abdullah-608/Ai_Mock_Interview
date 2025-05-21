@@ -126,15 +126,7 @@ export default function InterviewGenerateModal({ userId, username = "Abdullah-cr
               </button>
             </div>
             
-            {/* User info and timestamp banner */}
-            <div className="bg-indigo-900/40 border border-indigo-700/50 rounded-md p-3 mb-4">
-              <p className="text-indigo-200 text-sm">
-                <span className="font-medium">User:</span> {username}
-              </p>
-              <p className="text-indigo-200 text-sm">
-                <span className="font-medium">Date:</span> {currentDateTime || "2025-05-21 16:10:09"}
-              </p>
-            </div>
+            
             
             <p className="text-gray-400 mb-4">
               Create a personalized interview practice session tailored to your needs.

@@ -1,4 +1,4 @@
-import Link from "next/link";
+ import Link from "next/link";
 import Image from "next/image";
 import InterviewCard from "@/components/InterviewCard";
 import SubscriptionModal from "@/components/SubscriptionModal";
@@ -33,17 +33,20 @@ export default async function Home() {
           </p>
 
           <div className="flex gap-3 max-sm:flex-col">
-            <Link 
+           
+            
+            {/* Add the new Generate Interview button/modal */}
+            
+            <div className="block">
+            <SubscriptionModal userId={user?.id!} />
+            </div>
+             <Link 
               href="/interview"
-              className="btn-primary inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-center max-sm:w-full transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 animate-slideUp animation-delay-300"
+              className=" block btn-primary  px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-center  transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 animate-slideUp animation-delay-300"
             >
               Start an Interview
             </Link>
-            
-            {/* Add the new Generate Interview button/modal */}
-            <InterviewGenerateModal userId={user?.id!} />
-            
-            <SubscriptionModal userId={user?.id!} />
+            <InterviewGenerateModal userId={user?.id!}/>
           </div>
         </div>
 
