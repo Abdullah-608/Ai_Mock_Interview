@@ -4,7 +4,7 @@
 
 Prepwise is a comprehensive job interview preparation platform powered by Vapi AI Voice agents, designed to help job seekers practice and improve their interview skills with realistic AI-driven interviews.
 
-[Live Demo](https://ai-mock-interview-mtci.vercel.app/) | [Watch Tutorial](https://youtube.com/javascriptmastery)
+[Live Demo](https://ai-mock-interview-mtci.vercel.app/) |
 
 ## 📋 Table of Contents
 - [🤖 Introduction](#-introduction)
@@ -20,7 +20,6 @@ Prepwise is a comprehensive job interview preparation platform powered by Vapi A
 
 Built with Next.js for the user interface and backend logic, Firebase for authentication and data storage, styled with TailwindCSS and using Vapi's voice agents, Prepwise is a website project designed to help you learn integrating AI models with your apps. The platform offers a sleek and modern experience for job interview preparation.
 
-If you're getting started and need assistance or face any bugs, join our active Discord community with over 50k+ members. It's a place where people help each other out.
 
 ## ⚙️ Tech Stack
 
@@ -47,6 +46,12 @@ If you're getting started and need assistance or face any bugs, join our active 
 👉 **Dashboard**: Manage and track all your interviews with easy navigation.
 
 👉 **Responsiveness**: Fully responsive design that works seamlessly across devices.
+
+👉 **Retake Interview**: You can retake the interview again and again until you score the max
+
+👉 **Delete Interview**: You can Delete the interview if you don't want  it any more 
+
+
 
 And many more, including code architecture and reusability.
 
@@ -134,5 +139,8 @@ For more information about the technologies used:
 - [Vapi AI Documentation](https://docs.vapi.ai/)
 - [shadcn/ui Documentation](https://ui.shadcn.com/)
 - [Google Gemini Documentation](https://ai.google.dev/docs)
+
+
+I take help From Youtube Js Mastery 
 
 Built with ❤️ by Abdullah Mansoor

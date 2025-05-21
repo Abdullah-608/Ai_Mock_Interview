@@ -4,9 +4,19 @@ import Image from "next/image";
 
 import { Button } from "./ui/button";
 import DisplayTechIcons from "./DisplayTechIcons";
+import DeleteInterviewButton from "./DeleteInterviewButton";
 
 import { cn, getRandomInterviewCover } from "@/lib/utils";
 import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
+
+interface InterviewCardProps {
+  interviewId: string;
+  userId: string;
+  role: string;
+  type: string;
+  techstack: string[];
+  createdAt: Date | number | string;
+}
 
 const InterviewCard = async ({
   interviewId,
@@ -97,22 +107,26 @@ const InterviewCard = async ({
           </p>
         </div>
 
-        <div className="flex flex-row justify-between">
+        <div className="flex flex-row justify-between items-center">
           <div className="transition-transform duration-300 hover:scale-110">
             <DisplayTechIcons techStack={techstack} />
           </div>
 
-          <Button className="btn-primary transform transition-all duration-300 hover:scale-105 hover:brightness-110 active:scale-95">
-            <Link
-              href={
-                feedback
-                  ? `/interview/${interviewId}/feedback`
-                  : `/interview/${interviewId}`
-              }
-            >
-              {feedback ? "Check Feedback" : "View Interview"}
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <DeleteInterviewButton interviewId={interviewId} userId={userId} />
+            
+            <Button className="btn-primary transform transition-all duration-300 hover:scale-105 hover:brightness-110 active:scale-95">
+              <Link
+                href={
+                  feedback
+                    ? `/interview/${interviewId}/feedback`
+                    : `/interview/${interviewId}`
+                }
+              >
+                {feedback ? "Check Feedback" : "View Interview"}
+              </Link>
+            </Button>
+          </div>
         </div>
       </div>
     </div>

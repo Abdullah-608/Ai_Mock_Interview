@@ -123,3 +123,53 @@ export async function getInterviewsByUserId(
     ...doc.data(),
   })) as Interview[];
 }
+
+
+export async function deleteInterview({
+  interviewId,
+  userId,
+}: {
+  interviewId: string;
+  userId: string;
+}) {
+  try {
+    // First, verify that the interview belongs to the user
+    const interviewRef = db.collection("interviews").doc(interviewId);
+    const interviewDoc = await interviewRef.get();
+    
+    if (!interviewDoc.exists) {
+      return { success: false, error: "Interview not found" };
+    }
+    
+    const interviewData = interviewDoc.data();
+    
+    // Security check: ensure the user owns this interview
+    if (interviewData?.userId !== userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+    
+    // Get all feedback documents related to this interview
+    const feedbackQuery = await db
+      .collection("feedback")
+      .where("interviewId", "==", interviewId)
+      .get();
+    
+    // Delete all feedback documents in a batch
+    const batch = db.batch();
+    
+    feedbackQuery.docs.forEach((doc) => {
+      batch.delete(doc.ref);
+    });
+    
+    // Delete the interview document
+    batch.delete(interviewRef);
+    
+    // Commit the batch
+    await batch.commit();
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting interview:", error);
+    return { success: false, error: "Failed to delete interview" };
+  }
+}

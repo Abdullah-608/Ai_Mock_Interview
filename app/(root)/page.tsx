@@ -3,6 +3,7 @@ import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import InterviewCard from "@/components/InterviewCard";
+import SubscriptionModal from "@/components/SubscriptionModal";
 
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
@@ -32,12 +33,16 @@ async function Home() {
             Practice real interview questions & get instant feedback
           </p>
 
-          <Button 
-            asChild 
-            className="btn-primary max-sm:w-full transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 animate-slideUp animation-delay-300"
-          >
-            <Link href="/interview">Start an Interview</Link>
-          </Button>
+          <div className="flex gap-3 max-sm:flex-col">
+            <Button 
+              asChild 
+              className="btn-primary max-sm:w-full transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 animate-slideUp animation-delay-300"
+            >
+              <Link href="/interview">Start an Interview</Link>
+            </Button>
+            
+            <SubscriptionModal userId={user?.id!} />
+          </div>
         </div>
 
         <Image
