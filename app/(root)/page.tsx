@@ -1,9 +1,8 @@
 import Link from "next/link";
 import Image from "next/image";
-
-import { Button } from "@/components/ui/button";
 import InterviewCard from "@/components/InterviewCard";
 import SubscriptionModal from "@/components/SubscriptionModal";
+import InterviewGenerateModal from "@/components/InterviewGenerateModel";
 
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import {
@@ -11,7 +10,7 @@ import {
   getLatestInterviews,
 } from "@/lib/actions/general.action";
 
-async function Home() {
+export default async function Home() {
   const user = await getCurrentUser();
 
   const [userInterviews, allInterview] = await Promise.all([
@@ -34,12 +33,15 @@ async function Home() {
           </p>
 
           <div className="flex gap-3 max-sm:flex-col">
-            <Button 
-              asChild 
-              className="btn-primary max-sm:w-full transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 animate-slideUp animation-delay-300"
+            <Link 
+              href="/interview"
+              className="btn-primary inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-center max-sm:w-full transition-all duration-300 hover:scale-105 hover:shadow-lg active:scale-95 animate-slideUp animation-delay-300"
             >
-              <Link href="/interview">Start an Interview</Link>
-            </Button>
+              Start an Interview
+            </Link>
+            
+            {/* Add the new Generate Interview button/modal */}
+            <InterviewGenerateModal userId={user?.id!} />
             
             <SubscriptionModal userId={user?.id!} />
           </div>
@@ -122,5 +124,3 @@ async function Home() {
     </>
   );
 }
-
-export default Home;
