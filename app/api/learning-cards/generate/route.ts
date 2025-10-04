@@ -14,88 +14,42 @@ export async function POST(request: Request) {
       return Response.json({ error: 'Title, content, and userId are required' }, { status: 400 });
     }
 
-    // Generate structured learning content using AI
+    // Generate structured learning content using AI (optimized for speed)
     const { text } = await generateText({
       model: google("gemini-2.0-flash-001"),
-      prompt: `You are an expert educational content creator and learning specialist with 15+ years of experience. Create comprehensive, detailed learning materials for the following topic.
+      maxTokens: 2000, // Limit tokens for faster generation
+      temperature: 0.7,
+      prompt: `You are an expert educator. Create concise, well-structured learning materials for: "${title}"
 
-TOPIC: ${title}
-CONTENT TO LEARN: ${content}
+CONTEXT: ${content}
 
-TASK: Generate two outputs with maximum detail and depth:
+Generate a JSON response with exactly 2 fields:
 
-1. **COMPREHENSIVE STRUCTURED NOTES** - Create extremely detailed bullet-point notes that include:
-   - Core concepts with precise definitions and technical details
-   - Step-by-step processes and methodologies
-   - Multiple practical examples and use cases
-   - Advanced techniques and best practices
-   - Common pitfalls, mistakes, and how to avoid them
-   - Performance considerations and optimizations
-   - Security implications and best practices
-   - Integration patterns and architectural considerations
-   - Debugging techniques and troubleshooting guides
-   - Related technologies and how they connect
-   - Real-world case studies and success stories
-   - Industry standards and conventions
-   - Future trends and evolution of the topic
-   - Interview questions and answers related to this topic
-   - Code examples (if applicable) with explanations
+1. "notes": Structured bullet-point notes with:
+   - **Key Concepts**: Core ideas and definitions (use ** for headings)
+   - **Important Points**: 5-8 bullet points (•) covering main topics
+   - **Examples**: Practical examples with inline code using backticks
+   - **Best Practices**: 3-5 key recommendations
 
-**FORMATTING REQUIREMENTS FOR NOTES:**
-- Use bullet points (•) for all list items
-- Use **bold headings** for major sections (exactly 2 asterisks: **Core Concepts**, **Best Practices**)
-- Use inline code with single backticks for technical terms, functions, and variables
-- Structure with clear headings followed by bullet points
-- Keep formatting clean and consistent
-- IMPORTANT: Only use exactly 2 asterisks (**) for bold text, never more than 2
+2. "explanation": Clear explanation with:
+   - **Overview**: Brief introduction
+   - **How It Works**: Step-by-step breakdown
+   - **Practical Use**: Real-world applications with code examples
+   - **Key Takeaways**: Summary points
 
-2. **IN-DEPTH EXPLANATION** - Write a comprehensive, detailed explanation that:
-   - Provides thorough, beginner-to-advanced explanations
-   - Uses multiple analogies and real-world examples
-   - Explains the "why", "how", and "when" behind concepts
-   - Connects different ideas and shows relationships
-   - Provides historical context and evolution
-   - Discusses trade-offs and decision-making factors
-   - Includes performance implications and scalability considerations
-   - Covers edge cases and advanced scenarios
-   - Provides practical implementation guidance with code examples
-   - Includes troubleshooting and debugging approaches
-   - Discusses industry best practices and standards
-   - Explains related concepts and technologies
-   - Provides learning paths and next steps
+FORMATTING RULES:
+- Use exactly ** for headings (e.g., **Core Concepts**)
+- Use • or - for bullet points
+- Use \` for inline code
+- Use triple backticks for code blocks
+- Keep it concise but informative
+- Focus on clarity over length
 
-**FORMATTING REQUIREMENTS FOR EXPLANATION:**
-- Use **bold headings** for major sections (exactly 2 asterisks before and after: **Core Concepts**, **Advanced Topics**, **Best Practices**)
-- Include comprehensive code blocks using triple backticks for programming examples, syntax, and implementations
-- Use inline code with single backticks for specific terms, functions, variables, and technical concepts
-- Structure content with clear headings, bullet points, and numbered lists
-- Provide practical, real-world code examples that demonstrate the concepts
-- Include step-by-step implementations and tutorials
-- Use bullet points (•) for lists and numbered lists (1., 2., 3.) for sequential steps
-- Mix different content types: headings, paragraphs, lists, and code blocks
-- Make content highly readable with proper spacing and organization
-- IMPORTANT: Only use exactly 2 asterisks (**) for bold text, never more than 2
-
-DETAIL REQUIREMENTS:
-- Be extremely thorough and comprehensive
-- Include technical depth while remaining accessible
-- Provide multiple perspectives and approaches
-- Include practical, actionable information
-- Cover both fundamentals and advanced topics
-- Use clear, professional language
-- Structure information logically with clear hierarchy
-- Include specific examples and use cases
-- Address common questions and concerns
-- Provide context for when and why to use concepts
-
-OUTPUT FORMAT:
-Return your response as a JSON object with exactly these keys:
+RETURN VALID JSON:
 {
-  "notes": "Your extremely detailed structured notes here as a single string with line breaks",
-  "explanation": "Your comprehensive detailed explanation here as a single string"
-}
-
-Generate the most comprehensive, detailed, and valuable educational content possible that will help someone become an expert in this topic.`,
+  "notes": "your formatted notes here",
+  "explanation": "your formatted explanation here"
+}`,
     });
 
     try {
@@ -103,8 +57,14 @@ Generate the most comprehensive, detailed, and valuable educational content poss
       
       // Validate the response structure
       if (!parsedResponse.notes || !parsedResponse.explanation) {
-        throw new Error('Invalid response format');
+        console.error('Invalid AI response format:', parsedResponse);
+        throw new Error('AI response missing notes or explanation');
       }
+
+      console.log('AI generated successfully:', {
+        notesLength: parsedResponse.notes.length,
+        explanationLength: parsedResponse.explanation.length
+      });
 
       // Save the learning card to database
       const { success, cardId, error } = await createLearningCard({
@@ -117,8 +77,11 @@ Generate the most comprehensive, detailed, and valuable educational content poss
       });
 
       if (!success) {
+        console.error('Failed to save to database:', error);
         throw new Error(error || 'Failed to save learning card');
       }
+
+      console.log('Learning card saved successfully:', cardId);
 
       return Response.json({
         success: true,
@@ -222,10 +185,15 @@ This comprehensive understanding will enable you to effectively apply this knowl
     }
 
   } catch (error) {
-    console.error("Error generating learning content:", error);
+    console.error("=== ERROR GENERATING LEARNING CONTENT ===");
+    console.error("Error type:", error?.constructor?.name);
+    console.error("Error message:", error instanceof Error ? error.message : String(error));
+    console.error("Full error:", error);
+    
     return Response.json({ 
       success: false, 
-      error: 'Failed to generate learning content' 
+      error: error instanceof Error ? error.message : 'Failed to generate learning content',
+      details: process.env.NODE_ENV === 'development' ? String(error) : undefined
     }, { status: 500 });
   }
 }

@@ -1,17 +1,16 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 
 const SpaceBackground = () => {
-  const [stars, setStars] = useState<Array<{ id: number; x: number; y: number; size: number; duration: number; delay: number; opacity: number }>>([]);
   const [hyperspace, setHyperspace] = useState(false);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => {
-    setMounted(true);
-    // Generate random stars with varied sizes
-    const generatedStars = Array.from({ length: 300 }, (_, i) => {
+  // Memoize stars to prevent regeneration on every render
+  const stars = useMemo(() => {
+    // Reduced from 300 to 100 for better performance
+    return Array.from({ length: 100 }, (_, i) => {
       const rand = Math.random();
       let size;
       
@@ -29,12 +28,15 @@ const SpaceBackground = () => {
         x: Math.random() * 100,
         y: Math.random() * 100,
         size,
-        duration: Math.random() * 4 + 2,
+        duration: Math.random() * 4 + 3, // Slightly slower animations
         delay: Math.random() * 5,
         opacity: Math.random() * 0.5 + 0.3,
       };
     });
-    setStars(generatedStars);
+  }, []);
+
+  useEffect(() => {
+    setMounted(true);
   }, []);
 
   const handleClick = useCallback(() => {
@@ -88,11 +90,11 @@ const SpaceBackground = () => {
         />
       ))}
 
-      {/* Hyperspace effect */}
+      {/* Hyperspace effect - reduced elements for performance */}
       {hyperspace && (
         <>
-          {/* Light streaks */}
-          {Array.from({ length: 50 }).map((_, i) => (
+          {/* Light streaks - reduced from 50 to 20 */}
+          {Array.from({ length: 20 }).map((_, i) => (
             <motion.div
               key={i}
               className="absolute w-1 bg-gradient-to-r from-transparent via-white to-transparent"
@@ -124,14 +126,14 @@ const SpaceBackground = () => {
             }}
           />
 
-          {/* Warp tunnel effect */}
+          {/* Warp tunnel effect - reduced from 8 to 5 rings */}
           <motion.div
             className="absolute inset-0"
             initial={{ opacity: 0 }}
             animate={{ opacity: [0, 1, 0] }}
             transition={{ duration: 1.5 }}
           >
-            {Array.from({ length: 8 }).map((_, i) => (
+            {Array.from({ length: 5 }).map((_, i) => (
               <motion.div
                 key={i}
                 className="absolute inset-0 border-4 border-purple-500/30 rounded-full"

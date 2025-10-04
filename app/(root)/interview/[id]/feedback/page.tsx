@@ -11,7 +11,9 @@ import { Button } from "@/components/ui/button";
 import { getCurrentUser } from "@/lib/actions/auth.action";
 import { ArrowLeft, Repeat, Star, Calendar, TrendingUp, CheckCircle, AlertCircle } from "lucide-react";
 
-const Feedback = async ({ params }: RouteParams) => {
+export const dynamic = 'force-dynamic';
+
+const Feedback = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
   const user = await getCurrentUser();
 
