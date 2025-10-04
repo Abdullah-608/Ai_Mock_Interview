@@ -1,6 +1,12 @@
 {
   "framework": "nextjs",
   "functions": {
+    "app/api/learning-cards/generate/route.ts": {
+      "maxDuration": 60
+    },
+    "app/api/vapi/generate/route.ts": {
+      "maxDuration": 60
+    },
     "app/api/**/*.ts": {
       "maxDuration": 30
     }

@@ -2,6 +2,10 @@ import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
 import { createLearningCard } from "@/lib/actions/general.action";
 
+// Set function timeout to 60 seconds
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: Request) {
   try {
     const { title, content, userId, userName } = await request.json();

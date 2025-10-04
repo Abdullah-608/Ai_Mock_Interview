@@ -75,7 +75,13 @@ function LearningCardsClient({ user, allCards }: LearningCardsClientProps) {
         })
       });
 
-      if (!response.ok) throw new Error('Failed to generate learning content');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 504) {
+          throw new Error('AI generation is taking longer than expected. Please try with shorter content or try again later.');
+        }
+        throw new Error(errorData.error || 'Failed to generate learning content');
+      }
 
       const { cardId, notes, explanation } = await response.json();
 
@@ -96,7 +102,8 @@ function LearningCardsClient({ user, allCards }: LearningCardsClientProps) {
       setShowCreateForm(false);
       toast.success('Learning card created successfully!');
     } catch (error) {
-      toast.error('Failed to create learning card');
+      const message = error instanceof Error ? error.message : 'Failed to create learning card';
+      toast.error(message);
       console.error(error);
     } finally {
       setIsCreating(false);
