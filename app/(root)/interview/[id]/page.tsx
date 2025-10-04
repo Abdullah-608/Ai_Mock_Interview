@@ -12,6 +12,8 @@ import { getCurrentUser } from "@/lib/actions/auth.action";
 import DisplayTechIcons from "@/components/DisplayTechIcons";
 import { Briefcase, Code } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 const InterviewDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
 

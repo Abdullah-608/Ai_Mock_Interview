@@ -18,6 +18,7 @@ interface LearningCard {
   coverImage?: string;
 }
 
+export const dynamic = 'force-dynamic';
 
 const LearningCardDetails = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
