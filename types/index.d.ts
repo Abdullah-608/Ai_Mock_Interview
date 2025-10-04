@@ -25,6 +25,18 @@ interface Interview {
   finalized: boolean;
 }
 
+interface LearningCard {
+  id: string;
+  title: string;
+  content: string;
+  notes: string;
+  explanation: string;
+  createdAt: string;
+  userId: string;
+  userName?: string;
+  coverImage?: string;
+}
+
 interface CreateFeedbackParams {
   interviewId: string;
   userId: string;

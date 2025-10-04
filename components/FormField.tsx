@@ -16,6 +16,7 @@ interface FormFieldProps {
   label: string;
   placeholder: string;
   type: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const FormField: FC<FormFieldProps> = ({
@@ -24,6 +25,7 @@ const FormField: FC<FormFieldProps> = ({
   label,
   placeholder,
   type,
+  onChange,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
@@ -56,6 +58,10 @@ const FormField: FC<FormFieldProps> = ({
                   className="bg-transparent border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
+                  onChange={(e) => {
+                    field.onChange(e);
+                    onChange?.(e);
+                  }}
                 />
                 {type === "password" && (
                   <button

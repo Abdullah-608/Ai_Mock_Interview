@@ -23,19 +23,77 @@ export async function createFeedback(params: CreateFeedbackParams) {
       }),
       schema: feedbackSchema,
       prompt: `
-        You are an AI interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories. Be thorough and detailed in your analysis. Don't be lenient with the candidate. If there are mistakes or areas for improvement, point them out.
-        Transcript:
+        You are a senior hiring manager and expert interview coach analyzing a mock interview. Your feedback is critical for helping candidates improve their interview performance.
+
+        INTERVIEW TRANSCRIPT:
         ${formattedTranscript}
 
-        Please score the candidate from 0 to 100 in the following areas. Do not add categories other than the ones provided:
-        - **Communication Skills**: Clarity, articulation, structured responses.
-        - **Technical Knowledge**: Understanding of key concepts for the role.
-        - **Problem-Solving**: Ability to analyze problems and propose solutions.
-        - **Cultural & Role Fit**: Alignment with company values and job role.
-        - **Confidence & Clarity**: Confidence in responses, engagement, and clarity.
+        EVALUATION GUIDELINES:
+
+        Analyze the candidate's performance across these 5 key areas:
+
+        1. **Communication Skills (0-100)**
+           - Evaluate: Clarity, articulation, structure of responses, active listening
+           - Look for: STAR method usage, concise yet comprehensive answers, avoiding filler words
+           - Consider: Tone, pace, and ability to explain complex topics simply
+
+        2. **Technical Knowledge (0-100)**
+           - Evaluate: Depth of understanding, accuracy of technical explanations
+           - Look for: Practical examples, real-world applications, best practices awareness
+           - Consider: Ability to explain technical concepts clearly, handling of technical questions
+
+        3. **Problem Solving (0-100)**
+           - Evaluate: Analytical thinking, approach to challenges, logical reasoning
+           - Look for: Structured problem-solving, consideration of trade-offs, innovative thinking
+           - Consider: How they break down complex problems, handling of hypothetical scenarios
+
+        4. **Cultural Fit (0-100)**
+           - Evaluate: Professional demeanor, enthusiasm, alignment with role expectations
+           - Look for: Passion for the field, team collaboration mindset, growth mindset
+           - Consider: Values demonstrated, motivation, long-term career goals
+
+        5. **Confidence and Clarity (0-100)**
+           - Evaluate: Self-assurance without arrogance, clear expression of thoughts
+           - Look for: Handling uncertainty gracefully, admitting knowledge gaps professionally
+           - Consider: Body language cues (if mentioned), decisiveness, composure
+
+        SCORING RUBRIC:
+        - 90-100: Exceptional - Ready for senior roles, exceeds expectations
+        - 80-89: Strong - Well-prepared, minor improvements needed
+        - 70-79: Good - Competent but needs work in some areas
+        - 60-69: Average - Shows potential but significant gaps
+        - 50-59: Below Average - Needs substantial preparation
+        - Below 50: Needs significant improvement before re-interviewing
+
+        FOR EACH CATEGORY:
+        - Provide a specific, actionable comment (2-3 sentences)
+        - Reference actual responses from the transcript
+        - Give concrete examples of what was done well or needs improvement
+
+        STRENGTHS (Provide 3-5 specific strengths):
+        - Be specific and reference actual moments from the interview
+        - Focus on what made their answers stand out
+        - Highlight transferable skills
+
+        AREAS FOR IMPROVEMENT (Provide 3-5 specific areas):
+        - Be constructive and specific
+        - Provide actionable advice on how to improve
+        - Reference specific questions where they could have done better
+
+        FINAL ASSESSMENT:
+        Write a comprehensive 4-5 sentence summary that:
+        - Starts with an overall impression
+        - Highlights their top 2 strengths
+        - Identifies their main area for improvement
+        - Ends with encouraging words and next steps
+        - Maintains a professional yet supportive tone
+
+        TOTAL SCORE: Calculate the average of all 5 category scores (rounded to nearest integer)
+
+        Be honest but constructive. Your goal is to help them become better candidates.
         `,
       system:
-        "You are a professional interviewer analyzing a mock interview. Your task is to evaluate the candidate based on structured categories",
+        "You are an expert interview coach and senior hiring manager with 15+ years of experience evaluating candidates. Provide detailed, specific, and actionable feedback that helps candidates improve their interview skills.",
     });
 
     const feedback = {
@@ -115,13 +173,15 @@ export async function getInterviewsByUserId(
   const interviews = await db
     .collection("interviews")
     .where("userId", "==", userId)
-    .orderBy("createdAt", "desc")
     .get();
 
-  return interviews.docs.map((doc) => ({
+  // Sort by createdAt in memory to avoid composite index requirement
+  const sortedInterviews = interviews.docs.map((doc) => ({
     id: doc.id,
     ...doc.data(),
   })) as Interview[];
+
+  return sortedInterviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 }
 
 
@@ -171,5 +231,127 @@ export async function deleteInterview({
   } catch (error) {
     console.error("Error deleting interview:", error);
     return { success: false, error: "Failed to delete interview" };
+  }
+}
+
+// Learning Cards Functions
+export async function createLearningCard(params: {
+  title: string;
+  content: string;
+  notes: string;
+  explanation: string;
+  userId: string;
+  userName?: string;
+}) {
+  try {
+    const learningCard = {
+      title: params.title,
+      content: params.content,
+      notes: params.notes,
+      explanation: params.explanation,
+      userId: params.userId,
+      userName: params.userName,
+      coverImage: '/ai-avatar.png',
+      createdAt: new Date().toISOString(),
+    };
+
+    const docRef = await db.collection("learningCards").add(learningCard);
+    return { success: true, cardId: docRef.id };
+  } catch (error) {
+    console.error("Error creating learning card:", error);
+    return { success: false, error: "Failed to create learning card" };
+  }
+}
+
+export async function getLearningCardById(id: string): Promise<LearningCard | null> {
+  try {
+    const doc = await db.collection("learningCards").doc(id).get();
+    
+    if (!doc.exists) {
+      return null;
+    }
+
+    return {
+      id: doc.id,
+      ...doc.data(),
+    } as LearningCard;
+  } catch (error) {
+    console.error("Error fetching learning card:", error);
+    return null;
+  }
+}
+
+export async function getLearningCardsByUserId(userId: string): Promise<LearningCard[] | null> {
+  try {
+    const querySnapshot = await db
+      .collection("learningCards")
+      .where("userId", "==", userId)
+      .get();
+
+    // Sort by createdAt in memory to avoid composite index requirement
+    const cards = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as LearningCard[];
+
+    return cards.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  } catch (error) {
+    console.error("Error fetching user learning cards:", error);
+    return null;
+  }
+}
+
+export async function getAllLearningCards(limit: number = 20): Promise<LearningCard[] | null> {
+  try {
+    const querySnapshot = await db
+      .collection("learningCards")
+      .limit(limit * 2) // Get more to account for sorting
+      .get();
+
+    // Sort by createdAt in memory to avoid composite index requirement
+    const cards = querySnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as LearningCard[];
+
+    return cards
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit);
+  } catch (error) {
+    console.error("Error fetching all learning cards:", error);
+    return null;
+  }
+}
+
+export async function deleteLearningCard({
+  cardId,
+  userId,
+}: {
+  cardId: string;
+  userId: string;
+}) {
+  try {
+    // First, verify that the card belongs to the user
+    const cardRef = db.collection("learningCards").doc(cardId);
+    const cardDoc = await cardRef.get();
+    
+    if (!cardDoc.exists) {
+      return { success: false, error: "Learning card not found" };
+    }
+    
+    const cardData = cardDoc.data();
+    
+    // Security check: ensure the user owns this card
+    if (cardData?.userId !== userId) {
+      return { success: false, error: "Unauthorized" };
+    }
+    
+    // Delete the learning card document
+    await cardRef.delete();
+    
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting learning card:", error);
+    return { success: false, error: "Failed to delete learning card" };
   }
 }
