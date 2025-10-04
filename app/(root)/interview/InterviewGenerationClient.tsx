@@ -85,7 +85,6 @@ const InterviewGenerationClient = ({ user }: InterviewGenerationClientProps) => 
           <Agent
             userName={user?.name || ''}
             userId={user?.id}
-            profileImage={user?.profileURL}
             type="generate"
           />
         </div>

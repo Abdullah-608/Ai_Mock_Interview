@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     if (password === ADMIN_PASSWORD) {
       // Set admin session cookie
-      const cookieStore = cookies();
+      const cookieStore = await cookies();
       cookieStore.set('admin-auth', 'authenticated', {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',

@@ -34,6 +34,9 @@ export default function ProfilePage() {
     twoFactor: false
   });
 
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mounted, setMounted] = useState(false);
+
   const particlePositions = [
     { left: 10, top: 20 },
     { left: 80, top: 30 },
@@ -46,6 +49,17 @@ export default function ProfilePage() {
     { left: 85, top: 50 },
     { left: 40, top: 10 }
   ];
+
+  useEffect(() => {
+    setMounted(true);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   const handleSave = () => {
     setIsEditing(false);

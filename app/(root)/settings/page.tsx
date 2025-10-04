@@ -19,6 +19,22 @@ import {
 } from 'lucide-react';
 
 export default function SettingsPage() {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [mounted, setMounted] = useState(false);
+  
+  const particlePositions = [
+    { left: 10, top: 20 },
+    { left: 80, top: 30 },
+    { left: 30, top: 70 },
+    { left: 90, top: 80 },
+    { left: 15, top: 90 },
+    { left: 70, top: 15 },
+    { left: 50, top: 60 },
+    { left: 25, top: 40 },
+    { left: 85, top: 50 },
+    { left: 40, top: 10 }
+  ];
+  
   const [settings, setSettings] = useState({
     // Privacy Settings
     profileVisibility: 'private',
@@ -46,6 +62,17 @@ export default function SettingsPage() {
     exportFormat: 'json',
     autoBackup: true
   });
+
+  useEffect(() => {
+    setMounted(true);
+    
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
   const handleSave = () => {
     // Save settings to backend

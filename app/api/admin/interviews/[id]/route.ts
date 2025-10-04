@@ -4,18 +4,18 @@ import { db } from '@/firebase/admin';
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check admin authentication
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const adminAuth = cookieStore.get('admin-auth');
 
     if (!adminAuth || adminAuth.value !== 'authenticated') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const interviewId = params.id;
+    const { id: interviewId } = await params;
 
     if (!interviewId) {
       return NextResponse.json({ error: 'Interview ID is required' }, { status: 400 });

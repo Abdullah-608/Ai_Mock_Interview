@@ -87,8 +87,8 @@ const LearningCardDetails = async ({ params }: { params: Promise<{ id: string }>
           {/* Learning Agent Section */}
           <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-2xl animate-fadeIn h-[calc(100vh-280px)]">
             <LearningAgent
-              userName={user?.name!}
-              userId={user?.id}
+              userName={user?.name || 'Guest'}
+              userId={user?.id || 'guest'}
               learningCardId={id}
               learningCard={learningCard}
             />

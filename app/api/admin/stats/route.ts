@@ -5,7 +5,7 @@ import { db } from '@/firebase/admin';
 export async function GET() {
   try {
     // Check admin authentication
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const adminAuth = cookieStore.get('admin-auth');
 
     if (!adminAuth || adminAuth.value !== 'authenticated') {

@@ -147,7 +147,6 @@ const LearningAgent = ({
     vapi.on("speech-start", onSpeechStart);
     vapi.on("speech-end", onSpeechEnd);
     vapi.on("error", onError);
-    vapi.on("transport-change", onTransportChange);
 
     return () => {
       vapi.off("call-start", onCallStart);
@@ -156,7 +155,6 @@ const LearningAgent = ({
       vapi.off("speech-start", onSpeechStart);
       vapi.off("speech-end", onSpeechEnd);
       vapi.off("error", onError);
-      vapi.off("transport-change", onTransportChange);
     };
   }, []);
 
@@ -180,12 +178,12 @@ const LearningAgent = ({
         name: "Learning Assistant",
         firstMessage: `Hello ${userName}! I'm your AI learning assistant. I'm here to help you understand ${learningCard.title}. Let me explain the key concepts and answer any questions you might have.`,
         transcriber: {
-          provider: "deepgram",
+          provider: "deepgram" as const,
           model: "nova-2",
-          language: "en",
+          language: "en" as const,
         },
         voice: {
-          provider: "11labs",
+          provider: "11labs" as const,
           voiceId: "sarah",
           stability: 0.4,
           similarityBoost: 0.8,
@@ -194,11 +192,11 @@ const LearningAgent = ({
           useSpeakerBoost: true,
         },
         model: {
-          provider: "openai",
-          model: "gpt-4",
+          provider: "openai" as const,
+          model: "gpt-4" as const,
           messages: [
             {
-              role: "system",
+              role: "system" as const,
               content: `You are an expert learning assistant and tutor specializing in explaining complex topics in simple, engaging ways. Your goal is to help the student understand the learning material through conversation.
 
 LEARNING TOPIC: ${learningCard.title}
@@ -295,7 +293,7 @@ Remember: You're having a voice conversation, so keep responses natural and conv
     if (!text) return null;
     
     const lines = text.split('\n');
-    const formattedElements: JSX.Element[] = [];
+    const formattedElements: React.JSX.Element[] = [];
     let currentCodeBlock = '';
     let inCodeBlock = false;
     let codeBlockIndex = 0;
@@ -444,7 +442,7 @@ Remember: You're having a voice conversation, so keep responses natural and conv
 
     // Split by backticks to handle inline code
     const parts = text.split('`');
-    const elements: JSX.Element[] = [];
+    const elements: React.JSX.Element[] = [];
 
     parts.forEach((part, index) => {
       if (index % 2 === 1) {
@@ -471,7 +469,7 @@ Remember: You're having a voice conversation, so keep responses natural and conv
             return <span key={`${baseKey}-text-${index}-${boldIndex}`}>{boldPart}</span>;
           }
           return null;
-        }).filter(Boolean);
+        }).filter((element): element is React.JSX.Element => element !== null);
         
         if (boldElements.length > 0) {
           elements.push(...boldElements);
