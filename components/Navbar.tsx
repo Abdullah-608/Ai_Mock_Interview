@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback, memo } from 'react';
 import {
   Home,
   User,
@@ -22,7 +22,7 @@ interface NavbarProps {
   userName?: string;
 }
 
-export default function Navbar({ userEmail, userName }: NavbarProps) {
+function Navbar({ userEmail, userName }: NavbarProps) {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
@@ -38,9 +38,9 @@ export default function Navbar({ userEmail, userName }: NavbarProps) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = async () => {
+  const handleLogout = useCallback(async () => {
     await signOut();
-  };
+  }, []);
 
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
@@ -217,3 +217,6 @@ export default function Navbar({ userEmail, userName }: NavbarProps) {
     </motion.nav>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export default memo(Navbar);

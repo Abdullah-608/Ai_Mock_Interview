@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, memo, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Plus, 
@@ -42,7 +42,7 @@ interface LearningCardsClientProps {
   allCards: LearningCard[];
 }
 
-export default function LearningCardsClient({ user, allCards }: LearningCardsClientProps) {
+function LearningCardsClient({ user, allCards }: LearningCardsClientProps) {
   const [cards, setCards] = useState<LearningCard[]>(allCards);
   const [isCreating, setIsCreating] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -54,7 +54,7 @@ export default function LearningCardsClient({ user, allCards }: LearningCardsCli
     setCards(allCards);
   }, [allCards]);
 
-  const handleCreateCard = async () => {
+  const handleCreateCard = useCallback(async () => {
     if (!formData.title.trim() || !formData.content.trim()) {
       toast.error('Please fill in both title and content');
       return;
@@ -101,9 +101,9 @@ export default function LearningCardsClient({ user, allCards }: LearningCardsCli
     } finally {
       setIsCreating(false);
     }
-  };
+  }, [formData, user]);
 
-  const handleDeleteCard = async (cardId: string) => {
+  const handleDeleteCard = useCallback(async (cardId: string) => {
     try {
       const response = await fetch(`/api/learning-cards/${cardId}`, {
         method: 'DELETE',
@@ -120,15 +120,15 @@ export default function LearningCardsClient({ user, allCards }: LearningCardsCli
       toast.error('Failed to delete learning card');
       console.error(error);
     }
-  };
+  }, [user, cards]);
 
-  const confirmDelete = (cardId: string) => {
+  const confirmDelete = useCallback((cardId: string) => {
     setShowDeleteConfirm(cardId);
-  };
+  }, []);
 
-  const cancelDelete = () => {
+  const cancelDelete = useCallback(() => {
     setShowDeleteConfirm(null);
-  };
+  }, []);
 
   return (
     <div className="min-h-screen pt-24 pb-8 px-4 sm:px-6 lg:px-8">
@@ -375,3 +375,6 @@ export default function LearningCardsClient({ user, allCards }: LearningCardsCli
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export default memo(LearningCardsClient);

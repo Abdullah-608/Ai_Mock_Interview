@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useMemo, memo } from 'react';
 import { 
   User, 
   Mail, 
@@ -35,8 +36,8 @@ interface ProfileClientProps {
   stats: UserStats;
 }
 
-export default function ProfileClient({ user, stats }: ProfileClientProps) {
-  const formatDate = (dateString?: string) => {
+function ProfileClient({ user, stats }: ProfileClientProps) {
+  const formatDate = useMemo(() => (dateString?: string) => {
     if (!dateString) return 'Recently';
     try {
       return new Date(dateString).toLocaleDateString('en-US', {
@@ -47,7 +48,7 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
     } catch {
       return 'Recently';
     }
-  };
+  }, []);
 
   return (
     <div className="min-h-screen pt-24 pb-8 px-4 sm:px-6 lg:px-8">
@@ -295,3 +296,6 @@ export default function ProfileClient({ user, stats }: ProfileClientProps) {
     </div>
   );
 }
+
+// Memoize to prevent unnecessary re-renders
+export default memo(ProfileClient);

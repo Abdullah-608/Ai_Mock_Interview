@@ -3,14 +3,22 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { ArrowRight, Star, CheckCircle, Rocket, Shield, TrendingUp, Zap, ChevronLeft, ChevronRight, Brain } from 'lucide-react';
-import SpaceBackground from '@/components/SpaceBackground';
+import dynamic from 'next/dynamic';
 
-export default function LandingPageClient() {
+// Lazy load SpaceBackground component
+const SpaceBackground = dynamic(() => import('@/components/SpaceBackground'), {
+  ssr: false,
+  loading: () => <div className="fixed inset-0 bg-gradient-to-b from-slate-900 via-blue-900 to-slate-900" />
+});
+
+function LandingPageClient() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const testimonials = [
+  
+  // Memoize static data
+  const testimonials = useMemo(() => [
     {
       name: "Sarah Chen",
       role: "Software Engineer at Google",
@@ -29,9 +37,9 @@ export default function LandingPageClient() {
       content: "The personalized feedback helped me identify and improve my weak areas. Highly recommended!",
       rating: 5
     }
-  ];
+  ], []);
 
-  const features = [
+  const features = useMemo(() => [
     {
       icon: Rocket,
       title: "AI-Powered Interviews",
@@ -52,14 +60,14 @@ export default function LandingPageClient() {
       title: "Secure & Private",
       description: "Your interview data is encrypted and secure. Practice with confidence knowing your privacy is protected."
     }
-  ];
+  ], []);
 
-  const stats = [
+  const stats = useMemo(() => [
     { number: "50K+", label: "Successful Interviews" },
     { number: "95%", label: "Success Rate" },
     { number: "4.9/5", label: "User Rating" },
     { number: "100+", label: "Companies" }
-  ];
+  ], []);
 
   useEffect(() => {
     if (isPaused) return;
@@ -71,13 +79,13 @@ export default function LandingPageClient() {
     return () => clearInterval(interval);
   }, [isPaused, testimonials.length]);
 
-  const nextSlide = () => {
+  const nextSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev + 1) % testimonials.length);
-  };
+  }, [testimonials.length]);
 
-  const prevSlide = () => {
+  const prevSlide = useCallback(() => {
     setCurrentSlide((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  };
+  }, [testimonials.length]);
 
   return (
     <div className="min-h-screen relative overflow-hidden">
@@ -385,3 +393,6 @@ export default function LandingPageClient() {
     </div>
   );
 }
+
+// Memoize the component to prevent unnecessary re-renders
+export default memo(LandingPageClient);
