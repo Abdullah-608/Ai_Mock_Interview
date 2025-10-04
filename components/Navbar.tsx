@@ -7,7 +7,6 @@ import { useState, useRef, useEffect } from 'react';
 import {
   Home,
   User,
-  Settings,
   LogOut,
   ChevronDown,
   Menu,
@@ -150,16 +149,6 @@ export default function Navbar({ userEmail, userName }: NavbarProps) {
                         >
                           <User className="w-4 h-4" />
                           <span>Profile</span>
-                        </motion.button>
-                      </Link>
-                      
-                      <Link href="/settings">
-                        <motion.button
-                          whileHover={{ backgroundColor: 'rgba(255,255,255,0.1)' }}
-                          className="w-full flex items-center space-x-3 px-4 py-3 text-gray-300 hover:text-white transition-colors"
-                        >
-                          <Settings className="w-4 h-4" />
-                          <span>Settings</span>
                         </motion.button>
                       </Link>
                       
