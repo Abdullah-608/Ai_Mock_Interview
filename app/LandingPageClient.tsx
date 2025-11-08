@@ -3,8 +3,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect, useMemo, useCallback, memo } from 'react';
-import { ArrowRight, Star, CheckCircle, Rocket, Shield, TrendingUp, Zap, ChevronLeft, ChevronRight, Brain } from 'lucide-react';
+import { useState, useEffect, useMemo, memo } from 'react';
+import { ArrowRight, Star, Rocket, Shield, TrendingUp, Zap, Brain } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 // Lazy load SpaceBackground component
@@ -79,138 +79,166 @@ function LandingPageClient() {
     return () => clearInterval(interval);
   }, [isPaused, testimonials.length]);
 
-  const nextSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev + 1) % testimonials.length);
-  }, [testimonials.length]);
-
-  const prevSlide = useCallback(() => {
-    setCurrentSlide((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  }, [testimonials.length]);
-
   return (
     <div className="min-h-screen relative overflow-hidden">
       <SpaceBackground />
       
       {/* Navigation */}
-      <nav className="relative z-10 flex justify-between items-center p-6">
-        <div className="flex items-center space-x-2">
-          
-          <span className="text-white font-bold text-xl">PrepWise</span>
+      <nav className="relative z-10 flex items-center justify-between px-4 py-3 sm:px-6 sm:py-4 md:px-10 md:py-5">
+        <div className="flex items-center gap-2">
+          <Image
+            src="/svg/Logo.svg"
+            alt="Prepify logo"
+            width={40}
+            height={40}
+            className="w-10 h-10"
+            priority
+          />
+          <span className="text-white font-bold text-lg sm:text-xl">Prepify</span>
         </div>
         
-        <div className="hidden md:flex items-center space-x-8">
-          <Link href="/features" className="text-white/80 hover:text-white transition-colors">Features</Link>
-          <Link href="/pricing" className="text-white/80 hover:text-white transition-colors">Pricing</Link>
-          <Link href="/about" className="text-white/80 hover:text-white transition-colors">About</Link>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <Link 
-            href="/sign-in"
-            className="text-white/80 hover:text-white transition-colors"
+        <div className="flex items-center gap-2.5 md:gap-4">
+          <motion.div
+            whileHover={{ y: -2, scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: "spring", stiffness: 260, damping: 18 }}
+            className="relative"
           >
-            Sign In
-          </Link>
-          <Link 
-            href="/sign-up"
-            className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-full hover:shadow-lg hover:shadow-blue-500/25 transition-all"
+            <Link
+              href="/sign-in"
+              className="group relative inline-flex items-center justify-center px-4 py-2 text-xs sm:px-6 sm:py-2.5 sm:text-sm font-semibold sm:tracking-wide uppercase text-white/80 rounded-full border border-white/30 overflow-hidden transition-all duration-300"
+            >
+              <span className="absolute inset-0 rounded-full bg-white/[0.06] group-hover:bg-white/15 transition-all duration-300" />
+              <span className="relative z-10">Sign In</span>
+            </Link>
+          </motion.div>
+          <motion.div
+            whileHover={{ y: -2, scale: 1.05 }}
+            whileTap={{ scale: 0.96 }}
+            transition={{ type: "spring", stiffness: 260, damping: 18 }}
+            className="relative"
           >
-            Get Started
-          </Link>
+            <Link
+              href="/sign-up"
+              className="group relative inline-flex items-center justify-center px-4 py-2 text-xs sm:px-6 sm:py-2.5 sm:text-sm font-semibold sm:tracking-wide uppercase text-white rounded-full overflow-hidden transition-all duration-300"
+            >
+              <span className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500" />
+              <span className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 transition-opacity duration-300" />
+              <span className="relative z-10 flex items-center gap-2">
+                Get Started
+                <motion.span
+                  className="inline-block h-1.5 w-1.5 rounded-full bg-white/80"
+                  animate={{ scale: [1, 1.35, 1] }}
+                  transition={{ duration: 1.6, repeat: Infinity, repeatDelay: 0.6, ease: "easeInOut" }}
+                />
+              </span>
+            </Link>
+          </motion.div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <div className="relative z-10 text-center px-6 py-20">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="max-w-4xl mx-auto"
-        >
-          <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-            Master Your
-            <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              {" "}Interviews{" "}
-            </span>
-            with AI
-          </h1>
-          
-          <p className="text-xl md:text-2xl text-white/80 mb-8 leading-relaxed">
-            Practice with advanced AI interviewers, get personalized feedback, 
-            and land your dream job with confidence.
-          </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link 
-              href="/sign-up"
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all flex items-center gap-2"
-            >
-              Start Free Trial
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+      <div className="relative z-10 px-4 py-12 sm:px-6 sm:py-14 md:px-8 md:py-16">
+        <div className="max-w-6xl mx-auto grid gap-10 lg:grid-cols-2 lg:items-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center lg:text-left"
+          >
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-5 leading-tight">
+              Master Your{" "}
+              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                Interviews
+              </span>{" "}
+              with AI
+            </h1>
             
-            <button className="border border-white/20 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white/10 transition-all flex items-center gap-2">
-              Watch Demo
-              <Zap className="w-5 h-5" />
-            </button>
-          </div>
-        </motion.div>
-      </div>
+            <p className="text-base sm:text-lg md:text-xl text-white/80 mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+              Practice with advanced AI interviewers, get personalized feedback, and land your dream job with confidence.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-3 justify-center lg:justify-start items-center lg:items-start">
+              <Link 
+                href="/sign-up"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-7 py-3.5 rounded-full text-base sm:text-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all flex items-center gap-2"
+              >
+                Start Free Trial
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+              
+              <button className="border border-white/20 text-white px-7 py-3.5 rounded-full text-base sm:text-lg font-semibold hover:bg-white/10 transition-all flex items-center gap-2">
+                Watch Demo
+                <Zap className="w-5 h-5" />
+              </button>
+            </div>
 
-      {/* Stats Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 0.3 }}
-        className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto px-6 py-12"
-      >
-        {stats.map((stat, index) => (
-          <div key={index} className="text-center">
-            <div className="text-3xl md:text-4xl font-bold text-white mb-2">
-              {stat.number}
+            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6 lg:flex lg:flex-wrap lg:gap-8">
+              {stats.map((stat, index) => (
+                <div key={index} className="text-center lg:text-left">
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                    {stat.number}
+                  </div>
+                  <div className="text-white/60 text-xs sm:text-sm md:text-base mt-1">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
             </div>
-            <div className="text-white/60 text-sm md:text-base">
-              {stat.label}
-            </div>
-          </div>
-        ))}
-      </motion.div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.9, delay: 0.2 }}
+            className="relative mx-auto max-w-xs sm:max-w-md lg:max-w-xl lg:mx-0 w-full"
+          >
+            <Image
+              src="/svg/landing_page.svg"
+              alt="Preparing for mock interviews illustration"
+              width={720}
+              height={540}
+              className="w-full h-auto rounded-2xl sm:rounded-3xl"
+              priority
+            />
+          </motion.div>
+        </div>
+      </div>
 
       {/* Features Section */}
       <motion.div
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 0.6 }}
-        className="relative z-10 max-w-6xl mx-auto px-6 py-20"
+        className="relative z-10 max-w-6xl mx-auto px-4 py-16 sm:px-6 sm:py-20"
       >
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-5 sm:mb-6">
             Why Choose PrepWise?
           </h2>
-          <p className="text-xl text-white/70 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl text-white/70 max-w-2xl mx-auto">
             Our AI-powered platform provides everything you need to ace your next interview.
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid gap-6 sm:gap-8 sm:grid-cols-2">
           {features.map((feature, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.8 + index * 0.1 }}
-              className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10 hover:border-white/20 transition-all"
+              className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 sm:p-8 border border-white/10 hover:border-white/20 transition-all"
             >
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-4 space-y-4 sm:space-y-0">
+                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
                   <feature.icon className="w-6 h-6 text-white" />
                 </div>
-                <div>
-                  <h3 className="text-xl font-semibold text-white mb-3">
+                <div className="m-3">
+                  <h3 className=" text-lg sm:text-xl font-semibold text-white mb-3">
                     {feature.title}
                   </h3>
-                  <p className="text-white/70 leading-relaxed">
+                  <p className="text-sm sm:text-base text-white/70 leading-relaxed">
                     {feature.description}
                   </p>
                 </div>
@@ -225,13 +253,13 @@ function LandingPageClient() {
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8, delay: 1.2 }}
-        className="relative z-10 max-w-4xl mx-auto px-6 py-20"
+        className="relative z-10 max-w-4xl mx-auto px-4 py-16 sm:px-6 sm:py-20"
       >
-        <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+        <div className="text-center mb-12 sm:mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-5 sm:mb-6">
             Loved by Professionals
           </h2>
-          <p className="text-xl text-white/70">
+          <p className="text-base sm:text-lg text-white/70">
             See what our users say about their success with PrepWise.
           </p>
         </div>
@@ -249,26 +277,26 @@ function LandingPageClient() {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -100 }}
                 transition={{ duration: 0.5 }}
-                className="bg-white/5 backdrop-blur-lg rounded-2xl p-8 border border-white/10"
+                className="bg-white/5 backdrop-blur-lg rounded-2xl p-6 sm:p-8 border border-white/10"
               >
-                <div className="flex items-start space-x-6">
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:space-x-6 space-y-4 sm:space-y-0">
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
                     <span className="text-white font-bold text-xl">
                       {testimonials[currentSlide].name.charAt(0)}
                     </span>
                   </div>
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-1 mb-4">
+                  <div className="flex-1 text-center sm:text-left">
+                    <div className="flex items-center justify-center sm:justify-start space-x-1 mb-4">
                       {[...Array(testimonials[currentSlide].rating)].map((_, i) => (
                         <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                       ))}
                     </div>
-                    <blockquote className="text-white/90 text-lg leading-relaxed mb-4">
-                      "{testimonials[currentSlide].content}"
+                    <blockquote className="text-white/90 text-base sm:text-lg leading-relaxed mb-4">
+                      &ldquo;{testimonials[currentSlide].content}&rdquo;
                     </blockquote>
-                    <div className="text-white/60">
-                      <div className="font-semibold">{testimonials[currentSlide].name}</div>
-                      <div className="text-sm">{testimonials[currentSlide].role}</div>
+                    <div className="text-white/60 text-sm">
+                      <div className="font-semibold text-base sm:text-lg">{testimonials[currentSlide].name}</div>
+                      <div className="text-xs sm:text-sm">{testimonials[currentSlide].role}</div>
                     </div>
                   </div>
                 </div>
@@ -276,22 +304,8 @@ function LandingPageClient() {
             </AnimatePresence>
           </div>
           
-          {/* Navigation Buttons */}
-          <button
-            onClick={prevSlide}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-lg rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button
-            onClick={nextSlide}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-lg rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-          
           {/* Dots Indicator */}
-          <div className="flex justify-center space-x-2 mt-8">
+          <div className="flex justify-center space-x-2 mt-6 sm:mt-8">
             {testimonials.map((_, index) => (
               <button
                 key={index}
@@ -307,89 +321,93 @@ function LandingPageClient() {
         </div>
       </motion.div>
 
-      {/* CTA Section */}
-      <motion.div
-        initial={{ opacity: 0, y: 50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, delay: 1.6 }}
-        className="relative z-10 text-center px-6 py-20"
-      >
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Ace Your Next Interview?
-          </h2>
-          <p className="text-xl text-white/70 mb-8">
-            Join thousands of professionals who have already improved their interview skills with PrepWise.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
-              href="/sign-up"
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-4 rounded-full text-lg font-semibold hover:shadow-lg hover:shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
-            >
-              Start Your Free Trial
-              <CheckCircle className="w-5 h-5" />
-            </Link>
-            <Link 
-              href="/dashboard"
-              className="border border-white/20 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-white/10 transition-all"
-            >
-              View Dashboard
-            </Link>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-white/10 px-6 py-12">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">PW</span>
-                </div>
-                <span className="text-white font-bold text-xl">PrepWise</span>
+      {/* Hire Me Footer */}
+      <footer className="relative z-10 border-t border-white/10 bg-black/30 backdrop-blur-lg">
+        <div className="max-w-6xl mx-auto px-4 py-14 sm:px-6 lg:px-8">
+          <div className="grid gap-8 lg:grid-cols-[260px_1fr] items-center">
+            <div className="bg-white/5 border border-white/10 rounded-3xl p-6 flex flex-col items-center text-center lg:items-start lg:text-left">
+              <div className="w-40 h-40 mb-5">
+                <Image
+                  src="/svg/QR.svg"
+                  alt="Scan to connect with Abdullah Mansoor"
+                  width={160}
+                  height={160}
+                  className="w-full h-full object-contain"
+                  priority
+                />
               </div>
-              <p className="text-white/60 text-sm">
-                The AI-powered interview preparation platform that helps you land your dream job.
+              <p className="text-white font-semibold text-lg">Scan &amp; Connect</p>
+              <p className="text-white/60 text-sm mt-2">
+                Point your camera at the QR code to view my freelance profile and portfolio instantly.
               </p>
             </div>
-            
-            <div>
-              <h3 className="text-white font-semibold mb-4">Product</h3>
-              <div className="space-y-2">
-                <Link href="/features" className="block text-white/60 hover:text-white transition-colors">Features</Link>
-                <Link href="/pricing" className="block text-white/60 hover:text-white transition-colors">Pricing</Link>
-                <Link href="/integrations" className="block text-white/60 hover:text-white transition-colors">Integrations</Link>
+
+            <div className="space-y-8">
+              <div className="space-y-3">
+                <h3 className="text-3xl font-bold text-white">Let’s Build Something Great Together</h3>
+                <p className="text-white/70 text-base max-w-2xl">
+                  I help teams and founders craft human-centered interview experiences, powered by AI.
+                  Explore my work, see testimonials, and book a quick intro call through the links below.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                {[
+                  {
+                    name: "Upwork",
+                    href: "https://www.upwork.com/freelancers/~016dc2f789808a401f",
+                    description: "View contracts, reviews, and availability.",
+                  },
+                  {
+                    name: "LinkedIn",
+                    href: "https://www.linkedin.com/in/abdullah-608-mansoor",
+                    description: "Connect and follow professional updates.",
+                  },
+                  {
+                    name: "Portfolio",
+                    href: "https://your-portfolio-link.com",
+                    description: "See recent product design and AI projects.",
+                  },
+                ].map((link) => (
+                  <Link
+                    key={link.name}
+                    href={link.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all px-5 py-4 flex flex-col gap-2"
+                  >
+                    <span className="text-white font-semibold text-lg flex items-center gap-2">
+                      {link.name}
+                      <motion.span
+                        className="inline-block h-1.5 w-1.5 rounded-full bg-white/80"
+                        animate={{ scale: [1, 1.4, 1] }}
+                        transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                      />
+                    </span>
+                    <span className="text-white/60 text-sm leading-snug group-hover:text-white/80 transition-colors">
+                      {link.description}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-white/60 text-sm border-t border-white/10 pt-6">
+                <p>&copy; {new Date().getFullYear()} Prepify. Crafted with care by your next hire.</p>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+                  <Link
+                    href="mailto:abdullahmnsoor608@gmail.com"
+                    className="text-white hover:text-white/80 transition-colors"
+                  >
+                    abdullahmnsoor608@gmail.com
+                  </Link>
+                  
+                </div>
               </div>
             </div>
-            
-            <div>
-              <h3 className="text-white font-semibold mb-4">Company</h3>
-              <div className="space-y-2">
-                <Link href="/about" className="block text-white/60 hover:text-white transition-colors">About</Link>
-                <Link href="/careers" className="block text-white/60 hover:text-white transition-colors">Careers</Link>
-                <Link href="/contact" className="block text-white/60 hover:text-white transition-colors">Contact</Link>
-              </div>
-            </div>
-            
-            <div>
-              <h3 className="text-white font-semibold mb-4">Support</h3>
-              <div className="space-y-2">
-                <Link href="/help" className="block text-white/60 hover:text-white transition-colors">Help Center</Link>
-                <Link href="/docs" className="block text-white/60 hover:text-white transition-colors">Documentation</Link>
-                <Link href="/status" className="block text-white/60 hover:text-white transition-colors">Status</Link>
-              </div>
-            </div>
-          </div>
-          
-          <div className="border-t border-white/10 mt-12 pt-8 text-center">
-            <p className="text-white/60 text-sm">
-              © 2024 PrepWise. All rights reserved.
-            </p>
           </div>
         </div>
       </footer>
+
     </div>
   );
 }

@@ -1,8 +1,8 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import Agent from "@/components/Agent";
-import { Sparkles, Rocket, Zap } from 'lucide-react';
+import Link from "next/link";
+import { Sparkles, Rocket, Zap, ArrowRight } from 'lucide-react';
 
 interface InterviewGenerationClientProps {
   user: {
@@ -74,19 +74,35 @@ const InterviewGenerationClient = ({ user }: InterviewGenerationClientProps) => 
         </motion.div>
       </motion.div>
 
-      {/* Agent Component in a card */}
       <motion.div
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 0.6 }}
         className="max-w-7xl mx-auto"
       >
-        <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/80 backdrop-blur-lg rounded-3xl p-8 border border-white/10 shadow-2xl">
-          <Agent
-            userName={user?.name || ''}
-            userId={user?.id}
-            type="generate"
-          />
+        <div className="bg-gradient-to-br from-slate-900/80 to-slate-800/80 backdrop-blur-lg rounded-3xl p-8 border border-white/10 shadow-2xl space-y-6">
+          <h2 className="text-2xl font-semibold text-white">Start in the Interview Hub</h2>
+          <p className="text-gray-300 leading-relaxed">
+            Head over to the Interview dashboard to generate custom interview plans with Gemini,
+            review past sessions, and launch the interactive practice flow. Everything lives in one place so you can prep quickly.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/interviews"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold transition-transform hover:translate-x-1 hover:shadow-lg"
+            >
+              Go to Interview Hub
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <div className="flex-1 min-w-[220px] bg-white/5 border border-white/10 rounded-2xl p-4">
+              <p className="text-sm text-blue-200 font-semibold uppercase tracking-wide mb-2">
+                Tip
+              </p>
+              <p className="text-sm text-gray-300">
+                Use the “Generate Interview” button in the hub to create a plan tailored to your role, stack, and experience.
+              </p>
+            </div>
+          </div>
         </div>
       </motion.div>
     </div>

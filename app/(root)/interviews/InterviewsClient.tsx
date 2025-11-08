@@ -3,9 +3,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { Plus, Filter, Search, X, Sparkles } from 'lucide-react';
-import { useState, FormEvent, ChangeEvent, useEffect } from 'react';
+import { useState, FormEvent, ChangeEvent, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import InterviewCard from '@/components/InterviewCard';
+import { generateInterview } from '@/lib/actions/general.action';
 
 interface Interview {
   id: string;
@@ -39,7 +40,6 @@ interface FormData {
   level: string;
   amount: string;
   techstack: string;
-  userid: string;
 }
 
 export default function InterviewsClient({ userInterviews, allInterviews, user }: InterviewsClientProps) {
@@ -47,25 +47,16 @@ export default function InterviewsClient({ userInterviews, allInterviews, user }
   const [activeTab, setActiveTab] = useState<'my' | 'all'>('my');
   const [searchQuery, setSearchQuery] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTransitioning, startTransition] = useTransition();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentDateTime, setCurrentDateTime] = useState<string>("");
   const [formData, setFormData] = useState<FormData>({
     role: "",
     type: "mix",
     level: "entry",
     amount: "3",
     techstack: "",
-    userid: user?.id || ''
   });
-
-  useEffect(() => {
-    if (isModalOpen) {
-      const now = new Date();
-      const formattedDate = now.toISOString().slice(0, 19).replace('T', ' ');
-      setCurrentDateTime(formattedDate);
-    }
-  }, [isModalOpen]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -85,43 +76,46 @@ export default function InterviewsClient({ userInterviews, allInterviews, user }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+    const techArray = formData.techstack
+      .split(',')
+      .map((item) => item.trim())
+      .filter(Boolean);
 
-    try {
-      const requestData = {
-        ...formData,
-        requestTimestamp: currentDateTime
-      };
-      
-      const response = await fetch("https://ai-mock-interview-lake-two.vercel.app/api/vapi/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-        mode: "no-cors" 
-      });
+    startTransition(() => {
+      setLoading(true);
+      generateInterview({
+        userId: user?.id || '',
+        role: formData.role,
+        level: formData.level,
+        type: formData.type,
+        amount: Number(formData.amount) || 3,
+        techstack: techArray,
+      })
+        .then((result) => {
+          if (!result?.success) {
+            setError(result?.error || 'Unable to generate interview. Please try again.');
+            return;
+          }
 
-      setIsModalOpen(false);
-      router.refresh();
-      
-      // Reset form
-      setFormData({
-        role: "",
-        type: "mix",
-        level: "entry",
-        amount: "3",
-        techstack: "",
-        userid: user?.id || ''
-      });
-      
-    } catch (error) {
-      console.error("Error generating interview:", error);
-      setError("Network error connecting to the interview service. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
+          setIsModalOpen(false);
+          setFormData({
+            role: '',
+            type: 'mix',
+            level: 'entry',
+            amount: '3',
+            techstack: '',
+          });
+          router.refresh();
+        })
+        .catch((error) => {
+          console.error('Error generating interview:', error);
+          setError('Unexpected error generating interview. Please try again.');
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
   };
 
   const displayedInterviews = activeTab === 'my' ? userInterviews : allInterviews;
@@ -413,12 +407,12 @@ export default function InterviewsClient({ userInterviews, allInterviews, user }
                   </motion.button>
                   <motion.button
                     type="submit"
-                    disabled={loading}
-                    whileHover={{ scale: loading ? 1 : 1.02 }}
-                    whileTap={{ scale: loading ? 1 : 0.98 }}
+                    disabled={loading || isTransitioning}
+                    whileHover={{ scale: loading || isTransitioning ? 1 : 1.02 }}
+                    whileTap={{ scale: loading || isTransitioning ? 1 : 0.98 }}
                     className="flex-1 px-6 py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-xl font-semibold shadow-lg hover:shadow-purple-500/50 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {loading ? (
+                    {loading || isTransitioning ? (
                       <>
                         <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

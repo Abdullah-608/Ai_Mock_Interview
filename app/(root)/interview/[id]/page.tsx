@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 
-import Agent from "@/components/Agent";
 import { getInterviewCoverById, getTechLogos } from "@/lib/utils";
+import InterviewSession from "@/components/InterviewSession";
 
 import {
   getFeedbackByInterviewId,
@@ -87,12 +87,15 @@ const InterviewDetails = async ({ params }: { params: Promise<{ id: string }> })
 
           {/* Agent Section */}
           <div className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl rounded-3xl p-8 border border-white/10 shadow-2xl animate-fadeIn">
-            <Agent
-              userName={user?.name!}
-              userId={user?.id}
+            <InterviewSession
               interviewId={id}
-              type="interview"
+              userId={user?.id}
+              role={interview.role}
+              level={interview.level}
+              type={interview.type}
+              techstack={interview.techstack}
               questions={interview.questions}
+              plan={interview.plan}
               feedbackId={feedback?.id}
             />
           </div>

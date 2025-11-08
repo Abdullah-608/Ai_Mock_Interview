@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, FormEvent, ChangeEvent, useEffect } from "react";
+import { useState, FormEvent, ChangeEvent, useEffect, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { generateInterview } from "@/lib/actions/general.action";
 
 interface FormData {
   role: string;
@@ -9,7 +10,6 @@ interface FormData {
   level: string;
   amount: string;
   techstack: string;
-  userid: string;
 }
 
 interface InterviewGenerateModalProps {
@@ -20,6 +20,7 @@ interface InterviewGenerateModalProps {
 export default function InterviewGenerateModal({ userId, username = "Abdullah-cr" }: InterviewGenerateModalProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [currentDateTime, setCurrentDateTime] = useState<string>("");
@@ -29,7 +30,6 @@ export default function InterviewGenerateModal({ userId, username = "Abdullah-cr
     level: "entry",
     amount: "3",
     techstack: "",
-    userid: userId
   });
 
   // Set current date and time on component mount and when modal opens
@@ -63,45 +63,39 @@ export default function InterviewGenerateModal({ userId, username = "Abdullah-cr
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
+    const techArray = formData.techstack
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
 
-    try {
-      // Include timestamp in the request for tracking
-      const requestData = {
-        ...formData,
-        requestTimestamp: currentDateTime
-      };
-      
-      console.log("Submitting interview request:", requestData);
-      
-      // Try with CORS mode explicitly set
-      const response = await fetch("https://ai-mock-interview-lake-two.vercel.app/api/vapi/generate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestData),
-        // Setting mode to no-cors as a fallback - note this will make response unreadable
-        mode: "no-cors" 
-      });
-      
-      // With no-cors mode, we can't actually check response status
-      // So we'll just assume success and show the success message
+    startTransition(() => {
+      setLoading(true);
+      generateInterview({
+        userId,
+        role: formData.role,
+        level: formData.level,
+        type: formData.type,
+        amount: Number(formData.amount) || 3,
+        techstack: techArray,
+      })
+        .then((result) => {
+          if (!result?.success) {
+            setError(result?.error || "Unable to generate interview. Please try again.");
+            return;
+          }
 
-      // Close modal and refresh page to show new interview
-      setIsOpen(false);
-      router.refresh();
-      
-      // Show success message
-      alert("Interview request submitted! Please refresh to see your new interview.");
-      
-    } catch (error) {
-      console.error("Error generating interview:", error);
-      setError("Network error connecting to the interview service. Please try again later.");
-    } finally {
-      setLoading(false);
-    }
+          setIsOpen(false);
+          router.refresh();
+        })
+        .catch((error) => {
+          console.error("Error generating interview:", error);
+          setError("Unexpected error generating interview. Please try again.");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    });
   };
 
   return (
@@ -216,8 +210,6 @@ export default function InterviewGenerateModal({ userId, username = "Abdullah-cr
                 </select>
               </div>
               
-              <input type="hidden" name="userid" value={userId} />
-              
               <div className="flex justify-end gap-3 pt-4">
                 <button 
                   type="button" 
@@ -231,7 +223,7 @@ export default function InterviewGenerateModal({ userId, username = "Abdullah-cr
                   disabled={loading} 
                   className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {loading ? (
+                  {loading || isPending ? (
                     <span className="flex items-center">
                       <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

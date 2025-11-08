@@ -4,7 +4,8 @@ import { generateObject } from "ai";
 import { google } from "@ai-sdk/google";
 
 import { db } from "@/firebase/admin";
-import { feedbackSchema } from "@/constants";
+import { feedbackSchema, interviewBlueprintSchema } from "@/constants";
+import { revalidatePath } from "next/cache";
 
 export async function createFeedback(params: CreateFeedbackParams) {
   const { interviewId, userId, transcript, feedbackId } = params;
@@ -234,124 +235,68 @@ export async function deleteInterview({
   }
 }
 
-// Learning Cards Functions
-export async function createLearningCard(params: {
-  title: string;
-  content: string;
-  notes: string;
-  explanation: string;
-  userId: string;
-  userName?: string;
-}) {
-  try {
-    const learningCard = {
-      title: params.title,
-      content: params.content,
-      notes: params.notes,
-      explanation: params.explanation,
-      userId: params.userId,
-      userName: params.userName,
-      coverImage: '/ai-avatar.png',
-      createdAt: new Date().toISOString(),
-    };
+export async function generateInterview(params: GenerateInterviewParams) {
+  const { userId, role, level, type, amount, techstack } = params;
 
-    const docRef = await db.collection("learningCards").add(learningCard);
-    return { success: true, cardId: docRef.id };
-  } catch (error) {
-    console.error("Error creating learning card:", error);
-    return { success: false, error: "Failed to create learning card" };
+  if (!userId) {
+    return { success: false, error: "You must be signed in to generate an interview." };
   }
-}
 
-export async function getLearningCardById(id: string): Promise<LearningCard | null> {
   try {
-    const doc = await db.collection("learningCards").doc(id).get();
-    
-    if (!doc.exists) {
-      return null;
-    }
+    const techList = techstack
+      .map((tech) => tech.trim())
+      .filter((tech) => tech.length > 0);
 
+    const { object: blueprint } = await generateObject({
+      model: google("gemini-2.0-flash-001", { structuredOutputs: false }),
+      schema: interviewBlueprintSchema,
+      prompt: `
+You are an expert technical interviewer designing a mock interview plan.
+
+Role: ${role}
+Level: ${level}
+Interview Type: ${type}
+Primary Tech Stack: ${techList.join(", ") || "general software engineering"}
+Number of questions requested: ${amount}
+
+Produce a JSON object that includes:
+- "summary": high-level overview of the interview focus.
+- "behavioralQuestions": array of polished behavioral questions tailored to the role (prefer STAR prompts). Provide at least 2.
+- "technicalQuestions": array of technical/system design/architecture questions relevant to the stack (at least 2).
+- "codingChallenge": optional object with:
+    { "prompt": string, "hints": array of strings (optional), "solutionOutline": string (optional) }
+  Only include if interview type is technical or mixed.
+- "followUpTopics": optional array of recommended areas to review after the interview.
+
+Keep questions concise, specific, and aligned to ${level} expectations.
+      `,
+    });
+
+    const createdAt = new Date().toISOString();
+    const docRef = await db.collection("interviews").add({
+      userId,
+      role,
+      level,
+      type,
+      techstack: techList,
+      questions: [
+        ...(blueprint.behavioralQuestions || []),
+        ...(blueprint.technicalQuestions || []),
+      ],
+      summary: blueprint.summary,
+      plan: blueprint,
+      finalized: false,
+      createdAt,
+    });
+
+    revalidatePath("/interviews");
+
+    return { success: true, interviewId: docRef.id };
+  } catch (error) {
+    console.error("Error generating interview:", error);
     return {
-      id: doc.id,
-      ...doc.data(),
-    } as LearningCard;
-  } catch (error) {
-    console.error("Error fetching learning card:", error);
-    return null;
-  }
-}
-
-export async function getLearningCardsByUserId(userId: string): Promise<LearningCard[] | null> {
-  try {
-    const querySnapshot = await db
-      .collection("learningCards")
-      .where("userId", "==", userId)
-      .get();
-
-    // Sort by createdAt in memory to avoid composite index requirement
-    const cards = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as LearningCard[];
-
-    return cards.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  } catch (error) {
-    console.error("Error fetching user learning cards:", error);
-    return null;
-  }
-}
-
-export async function getAllLearningCards(limit: number = 20): Promise<LearningCard[] | null> {
-  try {
-    const querySnapshot = await db
-      .collection("learningCards")
-      .limit(limit * 2) // Get more to account for sorting
-      .get();
-
-    // Sort by createdAt in memory to avoid composite index requirement
-    const cards = querySnapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as LearningCard[];
-
-    return cards
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      .slice(0, limit);
-  } catch (error) {
-    console.error("Error fetching all learning cards:", error);
-    return null;
-  }
-}
-
-export async function deleteLearningCard({
-  cardId,
-  userId,
-}: {
-  cardId: string;
-  userId: string;
-}) {
-  try {
-    // First, verify that the card belongs to the user
-    const cardRef = db.collection("learningCards").doc(cardId);
-    const cardDoc = await cardRef.get();
-    
-    if (!cardDoc.exists) {
-      return { success: false, error: "Learning card not found" };
-    }
-    
-    const cardData = cardDoc.data();
-    
-    // Security check: ensure the user owns this card
-    if (cardData?.userId !== userId) {
-      return { success: false, error: "Unauthorized" };
-    }
-    
-    // Delete the learning card document
-    await cardRef.delete();
-    
-    return { success: true };
-  } catch (error) {
-    console.error("Error deleting learning card:", error);
-    return { success: false, error: "Failed to delete learning card" };
+      success: false,
+      error: "Unable to generate interview plan. Please try again shortly.",
+    };
   }
 }

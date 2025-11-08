@@ -12,7 +12,6 @@ import {
   Menu,
   X,
   MessageSquare,
-  BookOpen,
   Shield
 } from 'lucide-react';
 import { signOut } from '@/lib/actions/auth.action';
@@ -45,7 +44,6 @@ function Navbar({ userEmail, userName }: NavbarProps) {
   const navItems = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'Interviews', href: '/interviews', icon: MessageSquare },
-    { name: 'Learning Cards', href: '/learning-cards', icon: BookOpen },
     { name: 'Admin', href: '/admin', icon: Shield, adminOnly: true },
   ];
 
@@ -66,15 +64,15 @@ function Navbar({ userEmail, userName }: NavbarProps) {
             >
               <div className="relative w-10 h-10">
                 <Image
-                  src="/real_logo.svg"
-                  alt="PrepWise Logo"
+                  src="/svg/Logo.svg"
+                  alt="Prepify Logo"
                   width={40}
                   height={40}
                   className="w-full h-full"
                 />
               </div>
               <span className="text-xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                PrepWise
+                Prepify
               </span>
             </motion.div>
           </Link>

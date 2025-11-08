@@ -1,10 +1,9 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 
 const SpaceBackground = () => {
-  const [hyperspace, setHyperspace] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   // Memoize stars to prevent regeneration on every render
@@ -39,15 +38,9 @@ const SpaceBackground = () => {
     setMounted(true);
   }, []);
 
-  const handleClick = useCallback(() => {
-    setHyperspace(true);
-    setTimeout(() => setHyperspace(false), 2000);
-  }, []);
-
   return (
-    <div 
-      className="fixed inset-0 overflow-hidden pointer-events-auto cursor-pointer"
-      onClick={handleClick}
+    <div
+      className="fixed inset-0 overflow-hidden"
       style={{ zIndex: 0 }}
     >
       {/* Deep space background gradient */}
@@ -91,74 +84,6 @@ const SpaceBackground = () => {
       ))}
 
       {/* Hyperspace effect - reduced elements for performance */}
-      {hyperspace && (
-        <>
-          {/* Light streaks - reduced from 50 to 20 */}
-          {Array.from({ length: 20 }).map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-1 bg-gradient-to-r from-transparent via-white to-transparent"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                height: `${Math.random() * 200 + 100}px`,
-                transform: `rotate(${Math.random() * 360}deg)`,
-              }}
-              initial={{ opacity: 0, scaleX: 0 }}
-              animate={{ 
-                opacity: [0, 1, 0],
-                scaleX: [0, 1, 10],
-                x: [0, (Math.random() - 0.5) * 2000],
-                y: [0, (Math.random() - 0.5) * 2000],
-              }}
-              transition={{ duration: 1.5, ease: "easeOut" }}
-            />
-          ))}
-          
-          {/* Radial light burst */}
-          <motion.div
-            className="absolute inset-0 bg-white"
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: [0, 0.3, 0], scale: [0, 2, 3] }}
-            transition={{ duration: 2, ease: "easeOut" }}
-            style={{
-              background: 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(147,51,234,0.1) 30%, transparent 70%)',
-            }}
-          />
-
-          {/* Warp tunnel effect - reduced from 8 to 5 rings */}
-          <motion.div
-            className="absolute inset-0"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 1, 0] }}
-            transition={{ duration: 1.5 }}
-          >
-            {Array.from({ length: 5 }).map((_, i) => (
-              <motion.div
-                key={i}
-                className="absolute inset-0 border-4 border-purple-500/30 rounded-full"
-                style={{
-                  left: '50%',
-                  top: '50%',
-                  transform: 'translate(-50%, -50%)',
-                }}
-                initial={{ width: '100%', height: '100%', opacity: 0.8 }}
-                animate={{ 
-                  width: ['100%', '0%'],
-                  height: ['100%', '0%'],
-                  opacity: [0.8, 0],
-                }}
-                transition={{ 
-                  duration: 1.5,
-                  delay: i * 0.1,
-                  ease: "easeIn"
-                }}
-              />
-            ))}
-          </motion.div>
-        </>
-      )}
-
     </div>
   );
 };

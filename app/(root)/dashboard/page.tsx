@@ -1,10 +1,16 @@
 import { getCurrentUser } from "@/lib/actions/auth.action";
+import type { Metadata } from "next";
 import {
   getInterviewsByUserId,
   getFeedbackByInterviewId,
 } from "@/lib/actions/general.action";
 import { getTechLogos } from "@/lib/utils";
 import Dashboard from "./DashboardWrapper";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Your Prepify dashboard with interviews, feedback, and progress.",
+};
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();

@@ -2,23 +2,24 @@
 
 import { motion } from 'framer-motion';
 import { useMemo, memo } from 'react';
-import { 
-  User, 
-  Mail, 
-  Calendar, 
-  Award, 
-  Target, 
+import Link from "next/link";
+import Image from "next/image";
+import {
+  User,
+  Mail,
+  Calendar,
+  Award,
+  Target,
   TrendingUp,
-  BookOpen,
   MessageSquare,
   CheckCircle,
-  BarChart3
-} from 'lucide-react';
+  BarChart3,
+  ArrowUpRight,
+} from "lucide-react";
 
 interface UserStats {
   totalInterviews: number;
   completedInterviews: number;
-  totalLearningCards: number;
   averageScore: number;
   successRate: number;
 }
@@ -52,7 +53,7 @@ function ProfileClient({ user, stats }: ProfileClientProps) {
 
   return (
     <div className="min-h-screen pt-24 pb-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-7xl mx-auto">
+      <div className="max-w-7xl mx-auto space-y-10">
         {/* Profile Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -108,7 +109,7 @@ function ProfileClient({ user, stats }: ProfileClientProps) {
         </motion.div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -149,24 +150,6 @@ function ProfileClient({ user, stats }: ProfileClientProps) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="bg-gradient-to-br from-purple-900/50 to-purple-800/50 backdrop-blur-xl rounded-2xl p-6 border border-purple-500/20 shadow-xl"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-purple-400" />
-              </div>
-              <TrendingUp className="w-5 h-5 text-purple-400" />
-            </div>
-            <h3 className="text-3xl font-bold text-white mb-1">
-              {stats.totalLearningCards}
-            </h3>
-            <p className="text-purple-300 text-sm">Learning Cards</p>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
             className="bg-gradient-to-br from-orange-900/50 to-orange-800/50 backdrop-blur-xl rounded-2xl p-6 border border-orange-500/20 shadow-xl"
           >
             <div className="flex items-center justify-between mb-4">
@@ -237,8 +220,8 @@ function ProfileClient({ user, stats }: ProfileClientProps) {
                   <span className="text-white font-semibold">{stats.totalInterviews}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-gray-400">Learning Cards</span>
-                  <span className="text-white font-semibold">{stats.totalLearningCards}</span>
+                  <span className="text-gray-400">Completed Interviews</span>
+                  <span className="text-white font-semibold">{stats.completedInterviews}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-gray-400">Average Score</span>
@@ -252,6 +235,75 @@ function ProfileClient({ user, stats }: ProfileClientProps) {
             </div>
           </div>
         </motion.div>
+
+        <footer className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 sm:p-8">
+          <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] items-center">
+            <div className="flex flex-col gap-4">
+              <div className="inline-flex items-center gap-2 rounded-full border border-purple-400/40 bg-purple-500/10 px-3 py-1 text-xs font-semibold text-purple-200">
+                Open for opportunities
+              </div>
+              <h3 className="text-2xl font-bold text-white">
+                Build your next interview experience with a product-minded engineer.
+              </h3>
+              <p className="text-sm text-gray-400">
+                From onboarding flows to AI-powered coaching loops, I help teams create trustworthy candidate journeys. Let’s co-create something memorable.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                {[
+                  {
+                    label: "Upwork",
+                    href: "https://www.upwork.com/freelancers/~016dc2f789808a401f",
+                    description: "Reviews, contracts, availability.",
+                  },
+                  {
+                    label: "LinkedIn",
+                    href: "https://www.linkedin.com/in/abdullah-608-mansoor",
+                    description: "Connect professionally.",
+                  },
+                  {
+                    label: "Portfolio",
+                    href: "https://your-portfolio-link.com",
+                    description: "Recent work & case studies.",
+                  },
+                ].map((item) => (
+                  <Link
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group rounded-2xl border border-white/10 bg-white/5 px-4 py-3 transition hover:bg-white/10"
+                  >
+                    <p className="flex items-center justify-between text-sm font-semibold text-white">
+                      {item.label}
+                      <ArrowUpRight className="h-4 w-4 text-white/70 transition group-hover:translate-x-1 group-hover:-translate-y-1" />
+                    </p>
+                    <p className="mt-1 text-xs text-gray-400 group-hover:text-gray-200">
+                      {item.description}
+                    </p>
+                  </Link>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col items-center gap-3">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                <Image
+                  src="/svg/QR.svg"
+                  alt="Hire me QR code"
+                  width={160}
+                  height={160}
+                  className="h-40 w-40 object-contain"
+                />
+              </div>
+              <p className="text-xs text-gray-400 text-center max-w-xs">
+                Scan the QR code to jump straight to my profile, email, and booking links.
+              </p>
+            </div>
+          </div>
+          <div className="mt-6 border-t border-white/10 pt-4 text-sm text-gray-400">
+            &copy; {new Date().getFullYear()} Prepify · Let’s collaborate on the next interview platform.
+          </div>
+        </footer>
 
         {/* Account Information */}
         <motion.div

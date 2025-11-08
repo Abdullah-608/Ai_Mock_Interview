@@ -61,14 +61,6 @@ export async function getUserStats(userId: string) {
       (doc) => doc.data().finalized === true
     ).length;
     
-    // Get total learning cards
-    const learningCardsSnapshot = await db
-      .collection("learningCards")
-      .where("userId", "==", userId)
-      .get();
-    
-    const totalLearningCards = learningCardsSnapshot.size;
-    
     // Calculate average score from feedbacks
     const feedbacksSnapshot = await db
       .collection("feedbacks")
@@ -94,7 +86,6 @@ export async function getUserStats(userId: string) {
     return {
       totalInterviews,
       completedInterviews,
-      totalLearningCards,
       averageScore: parseFloat(averageScore as string),
       successRate,
     };
@@ -103,7 +94,6 @@ export async function getUserStats(userId: string) {
     return {
       totalInterviews: 0,
       completedInterviews: 0,
-      totalLearningCards: 0,
       averageScore: 0,
       successRate: 0,
     };

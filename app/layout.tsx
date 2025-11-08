@@ -9,8 +9,38 @@ const monaSans = Mona_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "PrepWise",
-  description: "An AI-powered platform for preparing for mock interviews",
+  title: {
+    default: "Prepify",
+    template: "%s | Prepify",
+  },
+  description: "Prepify is an AI-powered platform for mock interview preparation.",
+  applicationName: "Prepify",
+  keywords: [
+    "interview prep",
+    "mock interviews",
+    "AI interview coach",
+    "technical interviews",
+    "behavioral interviews",
+  ],
+  openGraph: {
+    title: "Prepify",
+    description: "AI-powered mock interview practice and feedback.",
+    url: "https://prepify.app",
+    siteName: "Prepify",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Prepify",
+    description: "AI-powered mock interview practice and feedback.",
+    creator: "@prepify",
+  },
+  icons: {
+    icon: [
+      { url: "/svg/Logo.svg", type: "image/svg+xml" },
+    ],
+    shortcut: "/svg/Logo.svg",
+  },
 };
 
 export default function RootLayout({

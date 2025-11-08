@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Users, 
-  BookOpen, 
   BarChart3, 
   Trash2, 
   Eye, 
@@ -14,7 +13,6 @@ import {
   Calendar,
   Shield,
   UserCheck,
-  AlertTriangle,
   MessageSquare
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -25,17 +23,7 @@ interface User {
   name?: string;
   email?: string;
   createdAt: string;
-  learningCardsCount: number;
   interviewsCount: number;
-}
-
-interface LearningCard {
-  id: string;
-  title: string;
-  content: string;
-  createdAt: string;
-  userId: string;
-  userName?: string;
 }
 
 interface Interview {
@@ -50,24 +38,17 @@ interface Interview {
 
 interface Stats {
   totalUsers: number;
-  totalLearningCards: number;
   totalInterviews: number;
-  recentActivity: number;
-  cardsCreatedToday: number;
   usersJoinedToday: number;
 }
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'cards' | 'interviews' | 'analytics'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'interviews' | 'analytics'>('overview');
   const [users, setUsers] = useState<User[]>([]);
-  const [learningCards, setLearningCards] = useState<LearningCard[]>([]);
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [stats, setStats] = useState<Stats>({
     totalUsers: 0,
-    totalLearningCards: 0,
     totalInterviews: 0,
-    recentActivity: 0,
-    cardsCreatedToday: 0,
     usersJoinedToday: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
@@ -80,9 +61,8 @@ export default function AdminDashboard() {
   const fetchDashboardData = async () => {
     try {
       setIsLoading(true);
-      const [usersRes, cardsRes, interviewsRes, statsRes] = await Promise.all([
+      const [usersRes, interviewsRes, statsRes] = await Promise.all([
         fetch('/api/admin/users'),
-        fetch('/api/admin/learning-cards'),
         fetch('/api/admin/interviews'),
         fetch('/api/admin/stats'),
       ]);
@@ -90,11 +70,6 @@ export default function AdminDashboard() {
       if (usersRes.ok) {
         const usersData = await usersRes.json();
         setUsers(usersData.users || []);
-      }
-
-      if (cardsRes.ok) {
-        const cardsData = await cardsRes.json();
-        setLearningCards(cardsData.cards || []);
       }
 
       if (interviewsRes.ok) {
@@ -143,29 +118,6 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteCard = async (cardId: string) => {
-    if (!confirm('Are you sure you want to delete this learning card?')) {
-      return;
-    }
-
-    try {
-      const response = await fetch(`/api/admin/learning-cards/${cardId}`, {
-        method: 'DELETE',
-      });
-
-      if (response.ok) {
-        setLearningCards(learningCards.filter(card => card.id !== cardId));
-        toast.success('Learning card deleted successfully');
-        fetchDashboardData(); // Refresh stats
-      } else {
-        toast.error('Failed to delete learning card');
-      }
-    } catch (error) {
-      toast.error('Failed to delete learning card');
-      console.error('Delete card error:', error);
-    }
-  };
-
   const handleDeleteInterview = async (interviewId: string) => {
     if (!confirm('Are you sure you want to delete this interview?')) {
       return;
@@ -192,10 +144,11 @@ export default function AdminDashboard() {
   const tabs = [
     { id: 'overview', label: 'Overview', icon: BarChart3 },
     { id: 'users', label: 'Users', icon: Users },
-    { id: 'cards', label: 'Learning Cards', icon: BookOpen },
     { id: 'interviews', label: 'Interviews', icon: MessageSquare },
     { id: 'analytics', label: 'Analytics', icon: TrendingUp },
   ];
+
+  const completedInterviewCount = interviews.filter((interview) => interview.finalized).length;
 
   if (isLoading) {
     return (
@@ -255,7 +208,7 @@ export default function AdminDashboard() {
         {activeTab === 'overview' && (
           <div className="space-y-6">
             {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -274,21 +227,6 @@ export default function AdminDashboard() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-gradient-to-br from-green-500/10 to-green-600/10 rounded-2xl p-6 border border-green-500/30"
-              >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-green-400 text-sm font-medium">Learning Cards</p>
-                    <p className="text-3xl font-bold text-white">{stats.totalLearningCards}</p>
-                  </div>
-                  <BookOpen className="w-8 h-8 text-green-400" />
-                </div>
-              </motion.div>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
                 className="bg-gradient-to-br from-purple-500/10 to-purple-600/10 rounded-2xl p-6 border border-purple-500/30"
               >
                 <div className="flex items-center justify-between">
@@ -303,15 +241,15 @@ export default function AdminDashboard() {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.2 }}
                 className="bg-gradient-to-br from-orange-500/10 to-orange-600/10 rounded-2xl p-6 border border-orange-500/30"
               >
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-orange-400 text-sm font-medium">Today's Activity</p>
-                    <p className="text-3xl font-bold text-white">{stats.cardsCreatedToday + stats.usersJoinedToday}</p>
+                    <p className="text-orange-400 text-sm font-medium">New Users Today</p>
+                    <p className="text-3xl font-bold text-white">{stats.usersJoinedToday}</p>
                   </div>
-                  <TrendingUp className="w-8 h-8 text-orange-400" />
+                  <Calendar className="w-8 h-8 text-orange-400" />
                 </div>
               </motion.div>
             </div>
@@ -328,17 +266,20 @@ export default function AdminDashboard() {
                 Recent Activity
               </h3>
               <div className="space-y-3">
-                {learningCards.slice(0, 5).map((card) => (
-                  <div key={card.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
+                {interviews.slice(0, 5).map((interview) => (
+                  <div key={interview.id} className="flex items-center justify-between p-3 bg-slate-800/50 rounded-lg">
                     <div>
-                      <p className="text-white font-medium">{card.title}</p>
-                      <p className="text-gray-400 text-sm">Created by {card.userName || 'Unknown'}</p>
+                      <p className="text-white font-medium">{interview.title}</p>
+                      <p className="text-gray-400 text-sm">Candidate: {interview.userName || 'Unknown'}</p>
                     </div>
                     <span className="text-gray-500 text-sm">
-                      {new Date(card.createdAt).toLocaleDateString()}
+                      {new Date(interview.createdAt).toLocaleDateString()}
                     </span>
                   </div>
                 ))}
+                {interviews.length === 0 && (
+                  <p className="text-gray-500 text-sm">No interviews recorded yet.</p>
+                )}
               </div>
             </motion.div>
           </div>
@@ -363,7 +304,6 @@ export default function AdminDashboard() {
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">User</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Learning Cards</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Joined</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
                   </tr>
@@ -387,9 +327,6 @@ export default function AdminDashboard() {
                         {user.email || 'No email'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {user.learningCardsCount}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -400,72 +337,6 @@ export default function AdminDashboard() {
                           <Trash2 className="w-4 h-4" />
                           Delete
                         </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Learning Cards Tab */}
-        {activeTab === 'cards' && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-slate-900/90 to-slate-800/90 backdrop-blur-xl rounded-2xl border border-white/10 overflow-hidden"
-          >
-            <div className="p-6 border-b border-white/10">
-              <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-green-400" />
-                Learning Cards Management ({learningCards.length} cards)
-              </h3>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-800/50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Title</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Author</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Created</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/10">
-                  {learningCards.map((card) => (
-                    <tr key={card.id} className="hover:bg-slate-800/30">
-                      <td className="px-6 py-4">
-                        <div className="text-sm font-medium text-white max-w-xs truncate">
-                          {card.title}
-                        </div>
-                        <div className="text-sm text-gray-400 max-w-xs truncate">
-                          {card.content}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {card.userName || 'Unknown'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                        {new Date(card.createdAt).toLocaleDateString()}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => window.open(`/learning-cards/${card.id}`, '_blank')}
-                            className="text-blue-400 hover:text-blue-300 flex items-center gap-1"
-                          >
-                            <Eye className="w-4 h-4" />
-                            View
-                          </button>
-                          <button
-                            onClick={() => handleDeleteCard(card.id)}
-                            className="text-red-400 hover:text-red-300 flex items-center gap-1"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                            Delete
-                          </button>
-                        </div>
                       </td>
                     </tr>
                   ))}
@@ -582,15 +453,15 @@ export default function AdminDashboard() {
                 </div>
 
                 <div className="space-y-4">
-                  <h4 className="text-white font-medium">Content Creation</h4>
+                  <h4 className="text-white font-medium">Interview Insights</h4>
                   <div className="bg-slate-800/50 rounded-lg p-4">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-400">Learning Cards</span>
-                      <span className="text-lg font-bold text-white">{stats.totalLearningCards}</span>
+                      <span className="text-sm text-gray-400">Total Interviews</span>
+                      <span className="text-lg font-bold text-white">{stats.totalInterviews}</span>
                     </div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-400">Created Today</span>
-                      <span className="text-lg font-bold text-blue-400">{stats.cardsCreatedToday}</span>
+                      <span className="text-sm text-gray-400">Completed Sessions</span>
+                      <span className="text-lg font-bold text-blue-400">{completedInterviewCount}</span>
                     </div>
                   </div>
                 </div>
@@ -612,7 +483,7 @@ export default function AdminDashboard() {
                     ))}
                   </div>
                   <p className="text-center text-gray-400 text-sm mt-4">
-                    Daily learning card creation activity
+                    Daily interview activity overview
                   </p>
                 </div>
               </div>

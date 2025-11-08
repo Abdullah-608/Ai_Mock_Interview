@@ -12,19 +12,9 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Fetch all users with their learning cards count
+    // Fetch all users with their interview count
     const usersSnapshot = await db.collection('users').get();
-    const learningCardsSnapshot = await db.collection('learningCards').get();
     const interviewsSnapshot = await db.collection('interviews').get();
-
-    // Count learning cards per user
-    const learningCardsCount: { [key: string]: number } = {};
-    learningCardsSnapshot.docs.forEach(doc => {
-      const data = doc.data();
-      if (data.userId) {
-        learningCardsCount[data.userId] = (learningCardsCount[data.userId] || 0) + 1;
-      }
-    });
 
     // Count interviews per user
     const interviewsCount: { [key: string]: number } = {};
@@ -42,7 +32,6 @@ export async function GET() {
         name: userData.name,
         email: userData.email,
         createdAt: userData.createdAt || userData.timestamp || new Date().toISOString(),
-        learningCardsCount: learningCardsCount[doc.id] || 0,
         interviewsCount: interviewsCount[doc.id] || 0,
       };
     });

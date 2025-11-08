@@ -23,18 +23,20 @@ interface Interview {
   userId: string;
   type: string;
   finalized: boolean;
+  summary?: string;
+  plan?: InterviewPlan;
 }
 
-interface LearningCard {
-  id: string;
-  title: string;
-  content: string;
-  notes: string;
-  explanation: string;
-  createdAt: string;
-  userId: string;
-  userName?: string;
-  coverImage?: string;
+interface InterviewPlan {
+  summary: string;
+  behavioralQuestions: string[];
+  technicalQuestions: string[];
+  codingChallenge?: {
+    prompt: string;
+    hints?: string[];
+    solutionOutline?: string;
+  };
+  followUpTopics?: string[];
 }
 
 interface CreateFeedbackParams {
@@ -57,15 +59,6 @@ interface InterviewCardProps {
   type: string;
   techstack: string[];
   createdAt?: string;
-}
-
-interface AgentProps {
-  userName: string;
-  userId?: string;
-  interviewId?: string;
-  feedbackId?: string;
-  type: "generate" | "interview";
-  questions?: string[];
 }
 
 interface RouteParams {
@@ -104,6 +97,15 @@ interface InterviewFormProps {
   type: string;
   techstack: string[];
   amount: number;
+}
+
+interface GenerateInterviewParams {
+  userId: string;
+  role: string;
+  level: string;
+  type: string;
+  amount: number;
+  techstack: string[];
 }
 
 interface TechIconProps {
